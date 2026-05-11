@@ -42,6 +42,7 @@
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Foto Daun</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Waktu Deteksi</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Lokasi Lahan</th>
+                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Umur Padi (Saat Deteksi)</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis AI</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap text-center">Aksi</th>
                     </tr>
@@ -54,13 +55,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                    @if($detection->image_path && $detection->image_path !== 'no-image.jpg')
-                                        <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect fill=%22%23f3f4f6%22 width=%2264%22 height=%2264%22/><text x=%2232%22 y=%2236%22 text-anchor=%22middle%22 font-size=%2224%22>🌿</text></svg>';">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                            <i class="fa-solid fa-image text-xl"></i>
-                                        </div>
-                                    @endif
+                                    <img src="{{ $detection->image_path }}" alt="Daun Padi" class="w-full h-full object-cover">
                                 </div>
                             </td>
                             
@@ -73,6 +68,17 @@
                                 <span class="text-sm font-medium text-gray-700"><i class="fa-solid fa-map-location-dot text-gray-400 mr-2"></i>{{ $detection->land->name }}</span>
                             </td>
                             
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    // Tambahkan intval() atau round() agar angka komanya hilang
+                                    $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
+                                    $hst = intval($rawDays);
+                                @endphp
+                                
+                                <span class="text-sm font-bold text-gray-800">{{ $hst }} Hari</span>
+                                <div class="text-xs text-gray-500 mt-0.5">Setelah Tanam (HST)</div>
+                            </td>
+
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($detection->nutrient_deficiency_id == 1) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
                                         <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
@@ -92,7 +98,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ $detection->image_path && $detection->image_path !== 'no-image.jpg' ? asset($detection->image_path) : '' }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
                                     class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
                                     Detail Solusi
                                 </button>

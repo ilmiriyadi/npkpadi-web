@@ -31,23 +31,38 @@
     <aside id="sidebar" class="bg-white w-72 min-h-screen border-r border-gray-100 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-lg md:shadow-none">
         
         <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-            <div class="text-2xl font-black text-[#387F39] flex items-center tracking-tight">
-                <i class="fa-solid fa-leaf mr-2"></i> NPK Padi
+            <div class="flex items-center space-x-3">
+                <img src="{{ asset('images/riceleafnutrition.png') }}" alt="Logo" class="h-14 object-contain">
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-red-500 text-2xl transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="px-6 py-6 flex items-center border-b border-gray-50">
-            <div class="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg mr-4 border-2 border-green-200">
+        <!-- Area Profil di Sidebar -->
+    <div class="flex items-center justify-between mb-8 px-2">
+        <div class="flex items-center">
+            <!-- Bulatan Inisial -->
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-xl border border-green-200 shadow-sm mr-4">
                 {{ substr(Auth::user()->name, 0, 1) }}
             </div>
-            <div class="overflow-hidden">
-                <p class="text-sm font-bold text-gray-800 truncate">{{ Auth::user()->name }}</p>
-                <p class="text-xs text-gray-500 truncate mt-0.5"><i class="fa-solid fa-tractor mr-1 text-gray-400"></i> Petani</p>
+            
+            <!-- Nama dan Role -->
+            <div>
+                <div class="font-bold text-gray-800 text-sm flex items-center">
+                    {{ Auth::user()->name }}
+                </div>
+                <div class="text-xs text-green-600 font-semibold mt-0.5 flex items-center">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> Petani
+                </div>
             </div>
         </div>
+
+        <!-- INI DIA IKON PENSILNYA -->
+        <a href="{{ route('farmer.settings') }}" class="w-8 h-8 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center transition-colors tooltip" title="Edit Profil">
+            <i class="fa-solid fa-pen-to-square text-sm"></i>
+        </a>
+    </div>
 
         <nav class="p-4 space-y-2 flex-1 overflow-y-auto custom-scrollbar">
             <a href="{{ route('farmer.dashboard') }}" class="flex items-center px-4 py-3.5 rounded-xl font-medium transition-colors {{ request()->routeIs('farmer.dashboard') ? 'text-green-700 bg-green-50' : 'text-gray-500 hover:text-green-600 hover:bg-green-50' }}">
@@ -78,12 +93,6 @@
         <header class="hidden md:flex bg-white/80 backdrop-blur-md px-8 py-5 border-b border-gray-100 justify-between items-center sticky top-0 z-30">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">@yield('header_title')</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:text-green-600 hover:bg-green-50 flex items-center justify-center transition-colors relative">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
             </div>
         </header>
 

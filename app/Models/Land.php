@@ -9,16 +9,19 @@ class Land extends Model
 {
     use HasFactory;
 
-    // Beri tahu Laravel nama Primary Key-mu
     protected $primaryKey = 'land_id';
 
-    // Kolom yang boleh diisi
     protected $fillable = [
         'user_id',
         'name',
         'location',
+        'planting_date',
     ];
 
+    protected $casts = [
+        'planting_date' => 'date',
+    ];
+    
     // Relasi: Lahan ini milik 1 User (Petani)
     public function user()
     {

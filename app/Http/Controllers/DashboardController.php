@@ -12,22 +12,58 @@ class DashboardController extends Controller
     // AREA ADMIN
     // ==========================================
 
-    public function admin()
+    public function admin(Request $request)
     {
-        // 1. Hitung total statistik keseluruhan sistem
+        // Hitung total statistik keseluruhan sistem
         $totalPetani = \App\Models\User::where('role', 'farmer')->count();
         $totalLahan = \App\Models\Land::count();
         $totalDeteksi = \App\Models\Detection::count();
 
-        // 2. Ambil 5 riwayat deteksi paling baru dari SEMUA petani
+        // Ambil 5 riwayat deteksi paling baru dari SEMUA petani
         $deteksiTerbaru = \App\Models\Detection::with(['land.user', 'nutrientDeficiency'])
                             ->orderBy('created_at', 'desc')
                             ->take(5)
                             ->get();
-        
-        return view('admin.dashboard', compact('totalPetani', 'totalLahan', 'totalDeteksi', 'deteksiTerbaru'));
-    }
 
+        // ==========================================
+        // GRAFIK NPK (DENGAN CUSTOM DATE RANGE)
+        // ==========================================
+        
+        // Tangkap inputan tanggal dari Admin. Jika kosong, default ke 7 hari terakhir
+        $startDate = $request->input('start_date', now()->subDays(6)->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
+
+        // Buat rentang tanggal (Array of Dates) menggunakan CarbonPeriod
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+        
+        $dates = [];
+        $nitrogen = [];
+        $fosfor = [];
+        $kalium = [];
+
+        // Looping setiap tanggal yang ada di dalam rentang waktu tersebut
+        foreach ($period as $dateObj) {
+            $dateString = $dateObj->format('Y-m-d');
+            $dates[] = $dateString; // Simpan tanggal aslinya
+
+            // Hitung jumlah deteksi di tanggal tersebut
+            $nitrogen[] = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 1)->count();
+            $fosfor[]   = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 2)->count();
+            $kalium[]   = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 3)->count();
+        }
+
+        $chartLabels = collect($dates)->map(function($d) {
+            return \Carbon\Carbon::parse($d)->locale('id')->translatedFormat('D, d M');
+        })->toArray();
+
+        // Passing variabel tanggal agar form di web tetap menampilkan tanggal yang dipilih
+        return view('admin.dashboard', compact(
+            'totalPetani', 'totalLahan', 'totalDeteksi', 'deteksiTerbaru',
+            'chartLabels', 'nitrogen', 'fosfor', 'kalium', 
+            'startDate', 'endDate'
+        ));
+    }
+    
     // Halaman Data Master (Admin)
     public function adminDataMaster()
     {
@@ -104,47 +140,35 @@ class DashboardController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.\App\Models\User::class],
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ]);
+
+        $defaultPassword = 'petani123';
 
         \App\Models\User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
             'role' => 'farmer', // Otomatis diset sebagai petani
         ]);
 
-        return redirect()->route('admin.users')->with('success', 'Akun Petani baru berhasil dibuat!');
+        return redirect()->route('admin.users')->with('success', 'Akun Petani baru berhasil ditambahkan dengan sandi bawaan: ' . $defaultPassword);
     }
 
-    // 3. Memproses update data Petani
+    // 3. Memproses RESET PASSWORD Petani
     public function adminUsersUpdate(Request $request, $id)
     {
-        // Pastikan kita mencari berdasarkan user_id
         $user = \App\Models\User::where('user_id', $id)->firstOrFail();
 
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            // PERBAIKAN DI SINI: Kita tambahkan nama kolom 'user_id' di akhir aturan unique
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
-        ]);
+        // 1. Tentukan password default-nya di sini
+        $defaultPassword = 'petani123'; 
 
+        // 2. Langsung update tanpa perlu validasi request (karena tidak ada form input)
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
         ]);
 
-        // Jika form password diisi, berarti Admin mereset password Petani
-        if ($request->filled('password')) {
-            $request->validate([
-                'password' => ['confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            ]);
-            $user->update([
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-            ]);
-        }
-
-        return redirect()->route('admin.users')->with('success', 'Data Petani berhasil diperbarui!');
+        return redirect()->route('admin.users')
+            ->with('success', 'Sandi akun ' . $user->name . ' berhasil direset ke default: ' . $defaultPassword);
     }
 
     // 4. Memproses penghapusan akun Petani
@@ -154,6 +178,32 @@ class DashboardController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users')->with('success', 'Akun Petani berhasil dihapus dari sistem!');
+    }
+
+    // 5. pengaturan profil admin
+    public function adminSettings()
+    {
+        $user = Auth::user();
+        return view('admin.settings', compact('user'));
+    }
+
+    public function adminSettingsUpdate(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->user_id.',user_id',
+            'password' => 'nullable|confirmed|min:8', // Opsional, hanya jika diisi
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->filled('password')) {
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil Admin berhasil diperbarui!');
     }
 
     // Halaman Riwayat Deteksi Keseluruhan (Admin)
@@ -188,6 +238,32 @@ class DashboardController extends Controller
     // ==========================================
     // AREA PETANI
     // ==========================================
+
+    // Halaman Pengaturan Profil Petani
+    public function farmerSettings()
+    {
+        $user = Auth::user();
+        return view('farmer.settings', compact('user'));
+    }
+
+    public function farmerSettingsUpdate(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->user_id.',user_id',
+            'password' => 'nullable|confirmed|min:8',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->filled('password')) {
+            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil Anda berhasil diperbarui!');
+    }
 
     // Halaman Dashboard Petani
     public function farmer()
@@ -245,6 +321,7 @@ class DashboardController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
+            'planting_date' => 'required|date',
         ]);
 
         // Simpan data ke tabel 'lands'
@@ -252,6 +329,7 @@ class DashboardController extends Controller
             'user_id' => Auth::id(), // Mengambil ID petani yang sedang login
             'name' => $request->name,
             'location' => $request->location,
+            'planting_date' => $request->planting_date,
         ]);
 
         return redirect()->route('farmer.lahan')->with('success', 'Lahan baru berhasil ditambahkan!');
@@ -263,6 +341,7 @@ class DashboardController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
+            'planting_date' => 'required|date',
         ]);
 
         // Cari lahan berdasarkan ID dan pastikan itu milik petani yang sedang login
@@ -271,6 +350,7 @@ class DashboardController extends Controller
         $land->update([
             'name' => $request->name,
             'location' => $request->location,
+            'planting_date' => $request->planting_date,
         ]);
 
         return redirect()->route('farmer.lahan')->with('success', 'Data lahan berhasil diperbarui!');

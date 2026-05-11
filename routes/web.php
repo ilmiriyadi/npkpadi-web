@@ -38,6 +38,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Halaman Riwayat Admin
     Route::get('/riwayat', [DashboardController::class, 'adminHistory'])->name('history');
 
+    // Halaman Pengaturan Profil Admin
+    Route::get('/settings', [DashboardController::class, 'adminSettings'])->name('settings');
+    Route::put('/settings', [DashboardController::class, 'adminSettingsUpdate'])->name('settings.update');
+
     // Halaman Manajemen User
     Route::get('/users', [DashboardController::class, 'adminUsers'])->name('users');    
     Route::post('/users', [DashboardController::class, 'adminUsersStore'])->name('users.store');
@@ -67,6 +71,10 @@ Route::prefix('farmer')->name('farmer.')->middleware('auth')->group(function () 
 
     // Halaman Riwayat Deteksi
     Route::get('/riwayat', [DashboardController::class, 'farmerHistory'])->name('history');
+
+    // Halaman Pengaturan Profil Petani
+    Route::get('/settings', [DashboardController::class, 'farmerSettings'])->name('settings');
+    Route::put('/settings', [DashboardController::class, 'farmerSettingsUpdate'])->name('settings.update');
 
 });
 

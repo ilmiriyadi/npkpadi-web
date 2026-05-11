@@ -28,7 +28,7 @@
 </head>
 
 <body class="relative min-h-screen bg-cover bg-center bg-fixed overflow-x-hidden" 
-style="background-image: url('{{ asset('images/sawah.png') }}');">
+style="background-image: url('{{ asset('images/sawah.jpg') }}');">
 
     <!-- Overlay -->
 
@@ -66,21 +66,21 @@ style="background-image: url('{{ asset('images/sawah.png') }}');">
         <section class="max-w-7xl mx-auto px-4 pb-20 grid md:grid-cols-3 gap-8">
 
             <div class="bg-white/60 backdrop-blur-md rounded-3xl p-4 shadow hover:-translate-y-2 transition">
-                <img src="{{ asset('images/raspberrypi.png') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
+                <img src="{{ asset('images/raspberrypi.jpg') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
                 <p class="text-sm text-justify">
                     Raspberry Pi merupakan komputer mini yang digunakan sebagai perangkat utama dalam sistem ini. Raspberry Pi berfungsi untuk menangkap gambar daun melalui kamera dan mengirimkannya ke sistem untuk diproses secara otomatis.
                 </p>
             </div>
 
             <div class="bg-white/60 backdrop-blur-md rounded-3xl p-4 shadow hover:-translate-y-2 transition md:-mt-8">
-                <img src="{{ asset('images/padi.png') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
+                <img src="{{ asset('images/padi.jpg') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
                 <p class="text-sm text-justify">
                     Padi (Oryza sativa) merupakan komoditas pangan utama yang produktivitasnya sangat dipengaruhi oleh ketersediaan unsur hara makro seperti Nitrogen (N), Fosfor (P), dan Kalium (K). Kekurangan nutrisi tersebut dapat menyebabkan perubahan warna dan bentuk daun yang berdampak pada  kualitas dan hasil panen.
                 </p>
             </div>
 
             <div class="bg-white/60 backdrop-blur-md rounded-3xl p-4 shadow hover:-translate-y-2 transition">
-                <img src="{{ asset('images/ai.png') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
+                <img src="{{ asset('images/ai.jpg') }}" class="rounded-xl mb-4 h-64 w-full object-cover">
                 <p class="text-sm text-justify">
                     Artificial Intelligence (AI) pada sistem ini diimplementasikan menggunakan metode Convolutional Neural Network (CNN) untuk menganalisis citra daun padi. Model CNN mengklasifikasikan kondisi nutrisi daun, seperti sehat atau mengalami defisiensi N, P, dan K, beserta tingkat akurasi prediksinya.
                 </p>
@@ -217,10 +217,10 @@ style="background-image: url('{{ asset('images/sawah.png') }}');">
                     📍 Jl. Brig Jend. Hasan Basri, Pangeran, Kec. Banjarmasin Utara, Kota Banjarmasin, Kalimantan Selatan 70124
                 </p>
                 <p class="flex items-center gap-2">
-                    ✉️ Ajie@gmail.com
+                    ✉️ poliban.ac.id
                 </p>
                 <p class="flex items-center gap-2">
-                    📞 +62 888-999-666-77
+                    📞 (0511) 330 5052
                 </p>
             </div>
 
@@ -228,7 +228,7 @@ style="background-image: url('{{ asset('images/sawah.png') }}');">
             <div class="flex flex-col items-center text-center">
                 <img src="{{ asset('images/riceleafnutrition.png') }}" class="h-14 mb-2">
                 <p class="text-gray-500 text-xs">
-                    © 2026 Rice Leaf Nutrition. All Rights Reserved
+                    © 2026 Politeknik Negeri Banjarmasin - Rice Leaf Nutrition. <br>All Rights Reserved
                 </p>
             </div>
 

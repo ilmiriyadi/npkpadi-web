@@ -22,7 +22,7 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div>
             <h2 class="text-xl font-bold text-gray-800">Manajemen Akun Petani</h2>
-            <p class="text-sm text-gray-500 mt-1">Buat, edit, dan pantau akun petani yang menggunakan alat Anda.</p>
+            <p class="text-sm text-gray-500 mt-1">Buat akun, reset sandi, dan pantau petani yang menggunakan alat Anda.</p>
         </div>
         
         <button onclick="openAddModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-800 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center transform hover:-translate-y-0.5">
@@ -77,11 +77,13 @@
 
                             <td class="px-6 py-4 text-center">
                                 <div class="flex justify-center space-x-2">
-                                    <button onclick="openEditModal('{{ $farmer->user_id }}', '{{ addslashes($farmer->name) }}', '{{ addslashes($farmer->email) }}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors tooltip" title="Edit Akun">
-                                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                    <!-- Tombol Reset Password (Kuning) -->
+                                    <button onclick="openResetModal('{{ $farmer->user_id }}', '{{ addslashes($farmer->name) }}')" class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 hover:bg-yellow-100 flex items-center justify-center transition-colors tooltip" title="Reset Password">
+                                        <i class="fa-solid fa-key text-xs"></i>
                                     </button>
                                     
-                                    <form action="{{ route('admin.users.destroy', $farmer->user_id) }}" method="POST" onsubmit="return confirm('YAKIN HAPUS PETANI INI? Semua data lahan dan riwayat deteksinya bisa ikut terpengaruh.');" class="inline-block">
+                                    <!-- Tombol Hapus (Merah) -->
+                                    <form action="{{ route('admin.users.destroy', $farmer->user_id) }}" method="POST" onsubmit="return confirm('YAKIN HAPUS PETANI INI? Semua data lahan dan riwayat deteksinya akan terhapus.');" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-colors tooltip" title="Hapus Akun">
@@ -106,6 +108,7 @@
         </div>
     </div>
 
+    <!-- MODAL TAMBAH (TETAP SAMA) -->
     <div id="addModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeAddModal()"></div>
@@ -127,15 +130,11 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Email <span class="text-red-500">*</span></label>
                                 <input type="email" name="email" required placeholder="Contoh: budi@gmail.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
-                                    <input type="password" name="password" required placeholder="Minimal 8 karakter" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Ulangi Password <span class="text-red-500">*</span></label>
-                                    <input type="password" name="password_confirmation" required placeholder="Ketik ulang password" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                                </div>
+                            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mt-2">
+                                <p class="text-xs text-blue-600">
+                                    <i class="fa-solid fa-circle-info mr-1"></i> 
+                                    Sandi akun akan otomatis disetel ke: <strong>petani123</strong>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -148,47 +147,35 @@
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- MODAL RESET PASSWORD (PENGGANTI EDIT MODAL) -->
+    <div id="resetModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeEditModal()"></div>
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeResetModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
-                <form id="editForm" method="POST">
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-gray-100">
+                <form id="resetForm" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="bg-white px-6 pt-6 pb-6 sm:p-8 sm:pb-6">
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-xl leading-6 font-bold text-gray-900">Edit Akun Petani</h3>
-                            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xl leading-6 font-bold text-gray-900">Konfirmasi Reset Sandi</h3>
+                            <button type="button" onclick="closeResetModal()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
                         </div>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap Petani <span class="text-red-500">*</span></label>
-                                <input type="text" name="name" id="edit_name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                        <p class="text-sm text-gray-500 mb-5">Anda akan mereset kata sandi untuk akun: <strong id="reset_farmer_name" class="text-gray-800 text-base"></strong></p>
+                        
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 text-center shadow-inner">
+                            <p class="text-sm font-medium text-yellow-800 mb-2">Kata sandi akan dikembalikan ke default sistem:</p>
+                            <div class="inline-block bg-white border-2 border-yellow-300 font-mono text-xl font-bold px-6 py-2 rounded-lg text-yellow-700 tracking-widest shadow-sm">
+                                petani123
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Email <span class="text-red-500">*</span></label>
-                                <input type="email" name="email" id="edit_email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                            </div>
-                            
-                            <div class="pt-2 mt-2 border-t border-gray-100">
-                                <p class="text-xs text-orange-500 font-medium mb-3"><i class="fa-solid fa-circle-info"></i> Kosongkan kolom di bawah jika tidak ingin mereset password petani.</p>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
-                                        <input type="password" name="password" placeholder="Minimal 8 karakter" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Ulangi Password</label>
-                                        <input type="password" name="password_confirmation" placeholder="Ketik ulang password" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="text-xs text-yellow-600 mt-3"><i class="fa-solid fa-circle-info mr-1"></i> Petani dapat mengubahnya nanti di menu Pengaturan.</p>
                         </div>
                     </div>
                     <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-gray-100">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-blue-600 text-base font-medium text-white hover:bg-blue-800 transition-colors sm:ml-3 sm:w-auto sm:text-sm">Simpan Perubahan</button>
-                        <button type="button" onclick="closeEditModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto sm:text-sm">Batal</button>
+                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-yellow-500 text-base font-bold text-white hover:bg-yellow-600 transition-colors sm:ml-3 sm:w-auto sm:text-sm flex items-center">
+                            <i class="fa-solid fa-rotate mr-2"></i> Ya, Reset Sekarang
+                        </button>
+                        <button type="button" onclick="closeResetModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto sm:text-sm">Batal</button>
                     </div>
                 </form>
             </div>
@@ -198,15 +185,16 @@
 
 @section('scripts')
 <script>
+    // Modal Tambah Petani
     function openAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
     function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
 
-    function openEditModal(id, name, email) {
-        document.getElementById('editForm').action = '/admin/users/' + id;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('edit_email').value = email;
-        document.getElementById('editModal').classList.remove('hidden');
+    // Modal Reset Password (pengganti Modal Edit)
+    function openResetModal(id, name) {
+        document.getElementById('resetForm').action = '/admin/users/' + id;
+        document.getElementById('reset_farmer_name').innerText = name;
+        document.getElementById('resetModal').classList.remove('hidden');
     }
-    function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+    function closeResetModal() { document.getElementById('resetModal').classList.add('hidden'); }
 </script>
 @endsection

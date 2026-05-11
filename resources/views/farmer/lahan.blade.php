@@ -58,6 +58,13 @@
                     </div>
                 </div>
 
+                <div class="space-y-3 text-sm text-gray-600 mb-6 relative z-10">
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center mr-3 flex-shrink-0"><i class="fa-solid fa-location-dot text-gray-400"></i></div>
+                        <p class="mt-1"><span class="font-medium text-gray-800">Tanggal Tanam:</span> <br> {{ $land->planting_date ? \Carbon\Carbon::parse($land->planting_date)->format('d M Y') : 'Belum ada detail tanggal tanam'}}</p>
+                    </div>
+                </div>
+
                 <a href="{{ route('farmer.history') }}" class="block w-full text-center bg-green-50 hover:bg-[#C8E6C9] text-green-800 font-semibold py-3 rounded-xl transition-colors text-sm relative z-10">
                     Lihat Data Nutrisi AI
                 </a>
@@ -95,6 +102,13 @@
                                 <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Detail Lokasi (Opsional)</label>
                                 <textarea name="location" id="location" rows="3" placeholder="Contoh: Desa Suka Maju, RT 01/RW 02" 
                                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm"></textarea>
+                            </div>
+
+                            <!-- Input Tanggal Tanam (Tambah) -->
+                            <div>
+                                <label for="planting_date" class="block text-sm font-bold text-gray-700 mb-1">Tanggal Tanam <span class="text-red-500">*</span></label>
+                                <input type="date" name="planting_date" id="planting_date" required
+                                    class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm transition-colors">
                             </div>
                         </div>
                     </div>
@@ -136,6 +150,10 @@
                                 <label for="edit_location" class="block text-sm font-medium text-gray-700 mb-1">Detail Lokasi</label>
                                 <textarea name="location" id="edit_location" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm"></textarea>
                             </div>
+                            <div>
+                                <label for="edit_planting_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tanam <span class="text-red-500">*</span></label>
+                                <input type="date" name="planting_date" id="edit_planting_date" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            </div>
                         </div>
                     </div>
                     
@@ -156,13 +174,14 @@
     function closeModal() { document.getElementById('lahanModal').classList.add('hidden'); }
 
     // TAMBAHKAN Script untuk Modal Edit ini:
-    function openEditModal(id, name, location) {
+    function openEditModal(id, name, location, planting_date) {
         // 1. Ubah alamat tujuan form sesuai ID lahan yang diklik
         document.getElementById('editLahanForm').action = '/farmer/lahan/' + id;
         
         // 2. Isi otomatis inputan dengan data lama
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_location').value = location;
+        document.getElementById('edit_planting_date').value = planting_date;
         
         // 3. Tampilkan modalnya
         document.getElementById('editLahanModal').classList.remove('hidden');
