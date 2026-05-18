@@ -107,8 +107,8 @@
                                 <div class="text-xs text-gray-500 mt-0.5"><i class="fa-solid fa-location-dot mr-1 text-gray-400"></i>{{ $deteksi->land->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-800">{{ $deteksi->created_at->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500">{{ $deteksi->created_at->format('H:i') }} WIB</div>
+                                <div class="text-gray-800">{{ $deteksi->created_at->timezone('Asia/Makassar')->format('d M Y') }}</div>
+                                <div class="text-xs text-gray-500">{{ $deteksi->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap font-medium">
                                 @if($deteksi->nutrient_deficiency_id == 1) <span class="text-green-600">{{ $deteksi->nutrientDeficiency->name }}</span>

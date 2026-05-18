@@ -28,7 +28,7 @@ class DetectionSeeder extends Seeder
             Detection::create([
                 'land_id' => $land->land_id,
                 'nutrient_deficiency_id' => $d['id'],
-                'image_path' => 'https://images.unsplash.com/photo-1628183185361-9c6a1e94cc07?auto=format&fit=crop&w=150&q=80',
+                'image_path' => 'detections/test_daun.jpg',
                 'confidence_score' => $d['score'],
                 'is_synced' => true,
                 'created_at' => now()->subDays($d['days']),
