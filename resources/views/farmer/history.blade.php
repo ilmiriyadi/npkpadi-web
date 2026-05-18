@@ -54,14 +54,22 @@
                             <td class="px-6 py-4 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                    <img src="{{ $detection->image_path }}" alt="Daun Padi" class="w-full h-full object-cover">
+                                @php
+                                    // LOGIKA PINTAR: Cek apakah gambar dari Seeder (URL) atau dari Alat Asli (File Storage)
+                                    $imageUrl = \Illuminate\Support\Str::startsWith($detection->image_path, ['http://', 'https://']) 
+                                                ? $detection->image_path 
+                                                : asset('storage/' . $detection->image_path);
+                                @endphp
+
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer"
+                                     onclick="openDetailModal('{{ $imageUrl }}', '{{ $detection->nutrientDeficiency->name }}', '{{ number_format($detection->confidence_score, 0) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')">
+                                    <img src="{{ $imageUrl }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-semibold text-gray-800">{{ $detection->created_at->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->format('H:i') }} WIB</div>
+                                <div class="text-sm font-semibold text-gray-800">{{ $detection->created_at->timezone('Asia/Makassar')->format('d M Y') }}</div>
+                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -80,25 +88,29 @@
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($detection->nutrient_deficiency_id == 1) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                @if($detection->nutrient_deficiency_id == 1) 
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
                                         <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                     </span>
-                                @elseif($detection->nutrient_deficiency_id == 2) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
+                                @elseif($detection->nutrient_deficiency_id == 2) 
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
                                         <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                     </span>
-                                @elseif($detection->nutrient_deficiency_id == 3) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                                @elseif($detection->nutrient_deficiency_id == 3) 
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
                                         <div class="w-2 h-2 rounded-full bg-orange-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                     </span>
-                                @else <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                @else 
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
                                         <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                     </span>
                                 @endif
-                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Akurasi AI: <span class="text-blue-600">{{ $detection->confidence_score }}%</span></div>
+                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Akurasi AI: <span class="text-blue-600">{{ number_format($detection->confidence_score, 0) }}%</span></div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ $imageUrl }}', '{{ $detection->nutrientDeficiency->name }}', '{{ number_format($detection->confidence_score, 0) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
                                     class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
                                     Detail Solusi
                                 </button>
@@ -106,7 +118,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3">
                                         <i class="fa-solid fa-camera-retro text-2xl text-gray-400"></i>

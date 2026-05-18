@@ -47,8 +47,17 @@
                             <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')">
-                                    <img src="{{ $detection->image_path }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+                                @php
+                                    // LOGIKA PINTAR: Cek apakah gambar dari Seeder (URL) atau dari Alat Asli (File Storage)
+                                    $imageUrl = Str::startsWith($detection->image_path, ['http://', 'https://']) 
+                                                ? $detection->image_path 
+                                                : asset('storage/' . $detection->image_path);
+                                @endphp
+
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" 
+                                    onclick="openDetailModal('{{ $imageUrl }}', '{{ $detection->nutrientDeficiency->name }}', '{{ number_format($detection->confidence_score, 0) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')">
+                                    
+                                    <img src="{{ $imageUrl }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
 
@@ -58,8 +67,8 @@
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-800 font-medium">{{ $detection->created_at->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->format('H:i') }} WIB</div>
+                                <div class="text-gray-800 font-medium">{{ $detection->created_at->timezone('Asia/Makassar')->format('d M Y') }}</div>
+                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -76,12 +85,13 @@
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $badgeClass }}">
                                     <div class="w-2 h-2 rounded-full {{ $dotClass }} mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                 </span>
-                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Akurasi AI: <span class="text-blue-600">{{ $detection->confidence_score }}%</span></div>
+                                
+                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Akurasi AI: <span class="text-blue-600">{{ number_format($detection->confidence_score, 0) }}%</span></div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ $imageUrl }}', '{{ $detection->nutrientDeficiency->name }}', '{{ number_format($detection->confidence_score, 0) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
                                     class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
                                     Detail Solusi
                                 </button>
