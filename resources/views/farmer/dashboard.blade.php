@@ -69,7 +69,7 @@
             @if($deteksiTerbaru)
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div class="w-full md:w-40 h-40 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
-                        <img src="{{ $deteksiTerbaru->image_path }}" alt="Daun Padi" class="w-full h-full object-cover">
+                        <img src="{{ asset($deteksiTerbaru->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover">
                     </div>
                     
                     <div class="flex-1 w-full">
