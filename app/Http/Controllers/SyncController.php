@@ -102,7 +102,7 @@ class SyncController extends Controller
                     'land_id'                => $landId,
                     'nutrient_deficiency_id' => $nutrientDeficiencyId,
                     'image_path'             => $imagePath ?? 'no-image.jpg',
-                    'confidence_score'       => $det['confidence'] / 100, // Simpan sebagai 0-1
+                    'confidence_score'       => $det['confidence'], // Simpan sebagai 0-100
                     'is_synced'              => true,
                 ]);
 

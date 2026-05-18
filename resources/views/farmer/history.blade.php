@@ -61,7 +61,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-gray-800">{{ $detection->created_at->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->format('H:i') }} WIB</div>
+                                <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -93,12 +93,12 @@
                                         <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
                                     </span>
                                 @endif
-                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Akurasi AI: <span class="text-blue-600">{{ $detection->confidence_score }}%</span></div>
+                                <div class="text-xs text-gray-500 mt-1.5 font-medium">Confidence Score: <span class="text-blue-600">{{ round($detection->confidence_score, 2) }}%</span></div>
                             </td>
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
                                     class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
                                     Detail Solusi
                                 </button>
@@ -141,7 +141,7 @@
                         <div class="w-full h-48 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 mb-4 relative">
                             <img id="modal_image" src="" alt="Daun Padi" class="w-full h-full object-cover">
                             <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold text-gray-800 shadow-sm">
-                                Akurasi AI: <span id="modal_accuracy" class="text-blue-600"></span>%
+                                Confidence Score: <span id="modal_accuracy" class="text-blue-600"></span>%
                             </div>
                         </div>
 

@@ -96,7 +96,7 @@
                         <th class="px-6 py-4 font-semibold">Petani & Lahan</th>
                         <th class="px-6 py-4 font-semibold">Waktu Deteksi</th>
                         <th class="px-6 py-4 font-semibold">Hasil AI</th>
-                        <th class="px-6 py-4 font-semibold text-center">Akurasi</th>
+                        <th class="px-6 py-4 font-semibold text-center">Confidence Score</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-gray-100">
@@ -118,7 +118,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full text-xs">{{ $deteksi->confidence_score }}%</span>
+                                <span class="bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full text-xs">{{ round($deteksi->confidence_score, 2) }}%</span>
                             </td>
                         </tr>
                     @empty
