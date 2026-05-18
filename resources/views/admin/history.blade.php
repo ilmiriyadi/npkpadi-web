@@ -47,8 +47,8 @@
                             <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')">
-                                    <img src="{{ $detection->image_path }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')">
+                                    <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
 
@@ -81,7 +81,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ $detection->image_path }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ $detection->confidence_score }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
                                     class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
                                     Detail Solusi
                                 </button>
