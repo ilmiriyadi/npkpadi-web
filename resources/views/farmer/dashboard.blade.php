@@ -67,15 +67,9 @@
             <h3 class="text-lg font-bold text-gray-800 mb-4">Status Pemantauan Terakhir</h3>
             
             @if($deteksiTerbaru)
-                @php
-                    // LOGIKA PINTAR: Membedakan gambar Seeder (URL) dan alat asli (Storage)
-                    $imageUrl = \Illuminate\Support\Str::startsWith($deteksiTerbaru->image_path, ['http://', 'https://']) 
-                                ? $deteksiTerbaru->image_path 
-                                : asset('storage/' . $deteksiTerbaru->image_path);
-                @endphp
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div class="w-full md:w-40 h-40 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
-                        <img src="{{ $imageUrl }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        <img src="{{ asset($deteksiTerbaru->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover">
                     </div>
                     
                     <div class="flex-1 w-full">
@@ -123,9 +117,9 @@
         const kondisiChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Kurang N', 'Kurang P', 'Kurang K'], 
+                labels: ['Kurang N', 'Kurang P', 'Kurang K'], // Hapus 'Sehat'
                 datasets: [{
-                    data: [{{ $countN }}, {{ $countP }}, {{ $countK }}], 
+                    data: [{{ $countN }}, {{ $countP }}, {{ $countK }}], // Hapus $countSehat
                     backgroundColor: [
                         '#eab308', // Kuning (Kurang N)
                         '#f97316', // Orange (Kurang P)
