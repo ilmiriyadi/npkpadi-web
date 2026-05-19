@@ -29,7 +29,7 @@
                 <i class="fa-solid fa-microchip"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 mb-1">Total Deteksi AI</p>
+                <p class="text-sm font-medium text-gray-500 mb-1">Total Deteksi</p>
                 <h3 class="text-3xl font-bold text-gray-800">{{ $totalDeteksi }} <span class="text-base font-normal text-gray-500">Kali</span></h3>
             </div>
         </div>

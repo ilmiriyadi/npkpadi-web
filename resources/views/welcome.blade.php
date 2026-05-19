@@ -36,7 +36,7 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
 
         <!-- NAVBAR -->
         <nav class="flex items-center justify-between px-8 py-5 max-w-7xl mx-auto w-full">
-            <img src="{{ asset('images/riceleafnutrition.png') }}" class="h-14">
+            <img src="{{ asset('images/greenLogo.png') }}" class="h-14">
 
             <div class="hidden md:flex bg-green-700 rounded-full p-1 space-x-1">
                 <a href="#" class="bg-green-200 text-green-800 px-6 py-2 rounded-full font-medium">Home</a>
@@ -93,16 +93,16 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
             <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
 
                 <div class="flex-1 text-center">
-                    <img src="{{ asset('images/riceleafnutrition.png') }}" class="w-64 mx-auto">
+                    <img src="{{ asset('images/greenLogo.png') }}" class="w-64 mx-auto">
                 </div>
 
                 <div class="flex-1">
                     <h2 class="text-4xl font-extrabold mb-6">
-                        About Us <span class="text-green-700"><br>Rice Leaf Nutrition</span>
+                        About Us <span class="text-green-700"><br>paddy Leaf Nutrition</span>
                     </h2>
 
                     <p class="text-gray-700 mb-4 text-justify">
-                        Rice Leaf Nutrition merupakan sistem berbasis web yang dirancang untuk membantu petani dalam mendeteksi defisiensi nutrisi pada daun padi secara cepat dan akurat. Sistem ini dikembangkan sebagai bagian dari penelitian berjudul “Rancang Bangun Alat Deteksi Defisiensi Nutrisi Daun Padi Menggunakan Raspberry Pi dan Algoritma CNN Berbasis Web.”
+                        paddy Leaf Nutrition merupakan sistem berbasis web yang dirancang untuk membantu petani dalam mendeteksi defisiensi nutrisi pada daun padi secara cepat dan akurat. Sistem ini dikembangkan sebagai bagian dari penelitian berjudul “Rancang Bangun Alat Deteksi Defisiensi Nutrisi Daun Padi Menggunakan Raspberry Pi dan Algoritma CNN Berbasis Web.”
                     </p>
 
                     <p class="text-gray-700 mb-4 text-justify">
@@ -127,11 +127,11 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
 
                 <div class="border rounded-lg bg-white shadow">
                     <button class="faq-btn w-full text-left px-6 py-4 font-semibold">
-                        Apa itu Rice Leaf Nutrition?
+                        Apa itu paddy Leaf Nutrition?
                     </button>
                     <div class="faq-content px-6">
                         <p class="py-4 text-gray-600">
-                            Rice Leaf Nutrition adalah sistem berbasis Artificial Intelligence yang digunakan untuk mendeteksi defisiensi nutrisi pada daun padi menggunakan metode Convolutional Neural Network (CNN) dari citra daun yang diambil menggunakan kamera.
+                            paddy Leaf Nutrition adalah sistem berbasis Artificial Intelligence yang digunakan untuk mendeteksi defisiensi nutrisi pada daun padi menggunakan metode Convolutional Neural Network (CNN) dari citra daun yang diambil menggunakan kamera.
                         </p>
                     </div>
                 </div>
@@ -152,7 +152,7 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
 
                 <div class="border rounded-lg bg-white shadow">
                     <button class="faq-btn w-full text-left px-6 py-4 font-semibold">
-                        Bagaimana cara kerja sistem Rice Leaf Nutrition?
+                        Bagaimana cara kerja sistem paddy Leaf Nutrition?
                     </button>
                     <div class="faq-content px-6">
                         <p class="py-4 text-gray-600">
@@ -167,7 +167,7 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
                     </button>
                     <div class="faq-content px-6">
                         <p class="py-4 text-gray-600">
-                            Tujuan sistem Rice Leaf Nutrition adalah membantu petani atau pengguna untuk mengetahui kondisi nutrisi tanaman padi lebih cepat dan akurat sehingga dapat dilakukan penanganan atau pemupukan yang tepat guna meningkatkan hasil panen.
+                            Tujuan sistem paddy Leaf Nutrition adalah membantu petani atau pengguna untuk mengetahui kondisi nutrisi tanaman padi lebih cepat dan akurat sehingga dapat dilakukan penanganan atau pemupukan yang tepat guna meningkatkan hasil panen.
                         </p>
                     </div>
                 </div>
@@ -226,9 +226,9 @@ style="background-image: url('{{ asset('images/sawah.jpg') }}');">
 
             <!-- CENTER: Logo -->
             <div class="flex flex-col items-center text-center">
-                <img src="{{ asset('images/riceleafnutrition.png') }}" class="h-14 mb-2">
+                <img src="{{ asset('images/greenLogo.png') }}" class="h-14 mb-2">
                 <p class="text-gray-500 text-xs">
-                    © 2026 Politeknik Negeri Banjarmasin - Rice Leaf Nutrition. <br>All Rights Reserved
+                    © 2026 Politeknik Negeri Banjarmasin - paddy Leaf Nutrition. <br>All Rights Reserved
                 </p>
             </div>
 

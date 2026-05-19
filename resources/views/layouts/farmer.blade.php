@@ -32,7 +32,7 @@
         
         <div class="p-6 border-b border-gray-50 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <img src="{{ asset('images/riceleafnutrition.png') }}" alt="Logo" class="h-14 object-contain">
+                <img src="{{ asset('images/greenLogo.png') }}" alt="Logo" class="h-14 object-contain">
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-red-500 text-2xl transition-colors">
                 <i class="fa-solid fa-xmark"></i>

@@ -24,7 +24,7 @@
         <div class="absolute inset-0 bg-black/30 lg:bg-black/20"></div>
 
         <div class="absolute top-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-8 z-20 flex items-center justify-center">
-            <img src="{{ asset('images/whitericeleafnutrition.png') }}"
+            <img src="{{ asset('images/whiteLogo.png') }}"
                  class="w-32 md:w-40 drop-shadow-xl">
         </div>
     </div>

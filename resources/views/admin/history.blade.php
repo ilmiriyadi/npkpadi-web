@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Pantau Riwayat AI - NPK Padi')
+@section('title', 'Pantau Riwayat - NPK Padi')
 @section('header_title', 'Pantau Seluruh Riwayat Deteksi')
 
 @section('content')
     <form action="{{ route('admin.history') }}" method="GET" class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">Semua Aktivitas AI</h2>
-            <p class="text-sm text-gray-500 mt-1">Pantau foto dan hasil deteksi AI dari seluruh lahan petani.</p>
+            <h2 class="text-xl font-bold text-gray-800">Semua Aktivitas</h2>
+            <p class="text-sm text-gray-500 mt-1">Pantau foto dan hasil deteksi dari seluruh lahan petani.</p>
         </div>
         
         <div class="flex space-x-3 w-full md:w-auto">
@@ -37,7 +37,7 @@
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Foto Daun</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Pemilik Lahan</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Waktu Deteksi</th>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis AI</th>
+                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap text-center">Aksi</th>
                     </tr>
                 </thead>
