@@ -10,7 +10,7 @@
         
         <div class="relative z-10">
             <h2 class="text-2xl md:text-3xl font-bold mb-2">Halo, Administrator!</h2>
-            <p class="text-blue-100 max-w-xl">Selamat datang di pusat kendali NPK Padi. Pantau aktivitas seluruh petani, lahan, dan statistik deteksi AI dari sini.</p>
+            <p class="text-blue-100 max-w-xl">Selamat datang di pusat kendali NPK Padi. Pantau aktivitas seluruh petani, lahan, dan statistik deteksi dari sini.</p>
         </div>
     </div>
 
@@ -40,7 +40,7 @@
                 <i class="fa-solid fa-microchip"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 mb-1">Total Deteksi AI</p>
+                <p class="text-sm font-medium text-gray-500 mb-1">Total Deteksi</p>
                 <h3 class="text-3xl font-bold text-gray-800">{{ $totalDeteksi }} <span class="text-base font-normal text-gray-500">Kali</span></h3>
             </div>
         </div>
@@ -95,7 +95,7 @@
                     <tr>
                         <th class="px-6 py-4 font-semibold">Petani & Lahan</th>
                         <th class="px-6 py-4 font-semibold">Waktu Deteksi</th>
-                        <th class="px-6 py-4 font-semibold">Hasil AI</th>
+                        <th class="px-6 py-4 font-semibold">Hasil Deteksi</th>
                         <th class="px-6 py-4 font-semibold text-center">Confidence Score</th>
                     </tr>
                 </thead>

@@ -69,7 +69,7 @@
                                     <span class="inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-600 tooltip" title="Total Lahan">
                                         <i class="fa-solid fa-map-location-dot mr-1.5"></i> {{ $farmer->total_lands }}
                                     </span>
-                                    <span class="inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-bold bg-green-50 text-green-600 tooltip" title="Total Deteksi AI">
+                                    <span class="inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-bold bg-green-50 text-green-600 tooltip" title="Total Deteksi">
                                         <i class="fa-solid fa-camera mr-1.5"></i> {{ $farmer->total_detections }}
                                     </span>
                                 </div>
