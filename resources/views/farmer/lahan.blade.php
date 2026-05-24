@@ -41,7 +41,7 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
 
-                        <form action="{{ route('farmer.lahan.destroy', $land->land_id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus lahan ini? Semua riwayat deteksi AI di lahan ini akan ikut terhapus permanen.');">
+                        <form action="{{ route('farmer.lahan.destroy', $land->land_id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus lahan ini? Semua riwayat deteksi di lahan ini akan ikut terhapus permanen.');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors tooltip" title="Hapus Lahan">
@@ -66,7 +66,7 @@
                 </div>
 
                 <a href="{{ route('farmer.history') }}" class="block w-full text-center bg-green-50 hover:bg-[#C8E6C9] text-green-800 font-semibold py-3 rounded-xl transition-colors text-sm relative z-10">
-                    Lihat Data Nutrisi AI
+                    Lihat Data Deteksi <i class="fa-solid fa-arrow-right ml-2"></i>
                 </a>
             </div>
             @endforeach
