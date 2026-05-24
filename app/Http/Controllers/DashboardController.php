@@ -41,15 +41,28 @@ class DashboardController extends Controller
         $fosfor = [];
         $kalium = [];
 
+        // Agregasi kueri grafik NPK dalam satu kueri tunggal untuk menghindari N+1 query
+        $detectionsGrouped = \App\Models\Detection::selectRaw('DATE(created_at) as date, nutrient_deficiency_id, COUNT(*) as count')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->groupBy('date', 'nutrient_deficiency_id')
+            ->get()
+            ->groupBy('date');
+
         // Looping setiap tanggal yang ada di dalam rentang waktu tersebut
         foreach ($period as $dateObj) {
             $dateString = $dateObj->format('Y-m-d');
             $dates[] = $dateString; // Simpan tanggal aslinya
 
-            // Hitung jumlah deteksi di tanggal tersebut
-            $nitrogen[] = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 1)->count();
-            $fosfor[]   = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 2)->count();
-            $kalium[]   = \App\Models\Detection::whereDate('created_at', $dateString)->where('nutrient_deficiency_id', 3)->count();
+            // Ambil data deteksi harian dari koleksi hasil grouping
+            $dayDetections = $detectionsGrouped->get($dateString, collect());
+
+            $nItem = $dayDetections->where('nutrient_deficiency_id', 1)->first();
+            $pItem = $dayDetections->where('nutrient_deficiency_id', 2)->first();
+            $kItem = $dayDetections->where('nutrient_deficiency_id', 3)->first();
+
+            $nitrogen[] = $nItem ? $nItem->count : 0;
+            $fosfor[]   = $pItem ? $pItem->count : 0;
+            $kalium[]   = $kItem ? $kItem->count : 0;
         }
 
         $chartLabels = collect($dates)->map(function($d) {
@@ -118,17 +131,16 @@ class DashboardController extends Controller
     public function adminUsers()
     {
         // Ambil semua user yang mendaftar sebagai 'farmer' (Petani)
+        // Ambil semua user yang mendaftar sebagai 'farmer' (Petani)
         $farmers = \App\Models\User::where('role', 'farmer')
+                    ->withCount(['lands', 'detections'])
                     ->orderBy('created_at', 'desc')
                     ->get();
 
-        // Hitung statistik Lahan dan Deteksi untuk masing-masing petani
+        // Hitung statistik Lahan dan Deteksi untuk masing-masing petani (menggunakan data count relasi)
         foreach ($farmers as $farmer) {
-            // UBAH $farmer->id menjadi $farmer->user_id di sini:
-            $landIds = \App\Models\Land::where('user_id', $farmer->user_id)->pluck('land_id');
-            
-            $farmer->total_lands = count($landIds);
-            $farmer->total_detections = \App\Models\Detection::whereIn('land_id', $landIds)->count();
+            $farmer->total_lands = $farmer->lands_count;
+            $farmer->total_detections = $farmer->detections_count;
         }
 
         return view('admin.users', compact('farmers'));

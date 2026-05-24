@@ -15,6 +15,7 @@ class Detection extends Model
         'land_id',
         'nutrient_deficiency_id',
         'image_path',
+        'segmented_image_path',
         'confidence_score',
         'is_synced',
     ];

@@ -97,12 +97,18 @@ class SyncController extends Controller
                     $imagePath = $this->saveImage($det['image_base64'], $det['local_id'] ?? $index);
                 }
 
+                $segmentedImagePath = null;
+                if (!empty($det['segmented_image_base64'])) {
+                    $segmentedImagePath = $this->saveImage($det['segmented_image_base64'], ($det['local_id'] ?? $index) . '_segmented');
+                }
+
                 // 4. Buat record deteksi
                 $detection = Detection::create([
                     'land_id'                => $landId,
                     'nutrient_deficiency_id' => $nutrientDeficiencyId,
                     'image_path'             => $imagePath ?? 'no-image.jpg',
-                    'confidence_score'       => $det['confidence'] / 100, // Simpan sebagai 0-1
+                    'segmented_image_path'   => $segmentedImagePath,
+                    'confidence_score'       => $det['confidence'], // Simpan sebagai 0-100
                     'is_synced'              => true,
                 ]);
 
