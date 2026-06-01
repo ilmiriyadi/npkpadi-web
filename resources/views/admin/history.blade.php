@@ -44,18 +44,12 @@
                 <tbody class="text-sm divide-y divide-gray-100">
                     @forelse($detections as $index => $detection)
                         @php
-                            // 1. LOGIKA PINTAR GAMBAR
-                            $imageUrl = \Illuminate\Support\Str::startsWith($detection->image_path, ['http://', 'https://']) 
-                                        ? $detection->image_path 
-                                        : asset('storage/' . $detection->image_path);
-
-                            // 2. LOGIKA PINTAR UMUR & SOLUSI
-                            // Hitung Umur Padi (HST)
+                            // LOGIKA PINTAR UMUR & SOLUSI
                             $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
                             $hst = intval($rawDays);
 
                             // Tentukan Fase dan Solusi Spesifik
-                            if ($hst <= 40) {
+                            if ($hst <= 30) {
                                 $fase = "Fase Vegetatif ($hst HST)";
                                 $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
                             } elseif ($hst <= 60) {
@@ -66,15 +60,15 @@
                                 $solusiSpesifik = $detection->nutrientDeficiency->solution_ripening;
                             }
 
-                            // Gabungkan Teks Solusi untuk Modal
-                            $teksSolusi = $detection->nutrientDeficiency->solution . " Status: " . $fase . ". " . $solusiSpesifik;
+                            // Gabungkan Teks Solusi
+                            $teksSolusi = $solusiSpesifik ? "[$fase] - " . $solusiSpesifik : $detection->nutrientDeficiency->solution;
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
                             
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
                                     <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
@@ -113,7 +107,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
+                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
                                     class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
                                     Detail Solusi
                                 </button>

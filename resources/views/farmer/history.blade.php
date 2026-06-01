@@ -50,11 +50,31 @@
                 <tbody class="text-sm divide-y divide-gray-100">
                     
                     @forelse($detections as $index => $detection)
+                    @php
+                        // Hitung HST (Hari Setelah Tanam)
+                        $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
+                        $hst = intval($rawDays);
+
+                        // Tentukan Fase dan Solusi Spesifik
+                        if ($hst <= 30) {
+                            $fase = "Fase Vegetatif ($hst HST)";
+                            $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
+                        } elseif ($hst <= 60) {
+                            $fase = "Fase Generatif ($hst HST)";
+                            $solusiSpesifik = $detection->nutrientDeficiency->solution_generative;
+                        } else {
+                            $fase = "Fase Pematangan ($hst HST)";
+                            $solusiSpesifik = $detection->nutrientDeficiency->solution_ripening;
+                        }
+
+                        // Gabungkan Teks Solusi
+                        $teksSolusi = $solusiSpesifik ? "[$fase] - " . $solusiSpesifik : $detection->nutrientDeficiency->solution;
+                    @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
                             
                              <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
                                     <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
@@ -98,7 +118,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
+                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
                                     class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
                                     Detail Solusi
                                 </button>
