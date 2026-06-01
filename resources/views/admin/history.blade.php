@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Pantau Riwayat AI - NPK Padi')
+@section('title', 'Pantau Riwayat - NPK Padi')
 @section('header_title', 'Pantau Seluruh Riwayat Deteksi')
 
 @section('content')
     <form action="{{ route('admin.history') }}" method="GET" class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">Semua Aktivitas AI</h2>
-            <p class="text-sm text-gray-500 mt-1">Pantau foto dan hasil deteksi AI dari seluruh lahan petani.</p>
+            <h2 class="text-xl font-bold text-gray-800">Semua Aktivitas</h2>
+            <p class="text-sm text-gray-500 mt-1">Pantau foto dan hasil deteksi dari seluruh lahan petani.</p>
         </div>
         
         <div class="flex space-x-3 w-full md:w-auto">
@@ -37,12 +37,39 @@
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Foto Daun</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Pemilik Lahan</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Waktu Deteksi</th>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis AI</th>
+                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-gray-100">
                     @forelse($detections as $index => $detection)
+                        @php
+                            // 1. LOGIKA PINTAR GAMBAR
+                            $imageUrl = \Illuminate\Support\Str::startsWith($detection->image_path, ['http://', 'https://']) 
+                                        ? $detection->image_path 
+                                        : asset('storage/' . $detection->image_path);
+
+                            // 2. LOGIKA PINTAR UMUR & SOLUSI
+                            // Hitung Umur Padi (HST)
+                            $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
+                            $hst = intval($rawDays);
+
+                            // Tentukan Fase dan Solusi Spesifik
+                            if ($hst <= 40) {
+                                $fase = "Fase Vegetatif ($hst HST)";
+                                $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
+                            } elseif ($hst <= 60) {
+                                $fase = "Fase Generatif ($hst HST)";
+                                $solusiSpesifik = $detection->nutrientDeficiency->solution_generative;
+                            } else {
+                                $fase = "Fase Pemasakan ($hst HST)";
+                                $solusiSpesifik = $detection->nutrientDeficiency->solution_ripening;
+                            }
+
+                            // Gabungkan Teks Solusi untuk Modal
+                            $teksSolusi = $detection->nutrientDeficiency->solution . " Status: " . $fase . ". " . $solusiSpesifik;
+                        @endphp
+
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
                             
@@ -62,6 +89,11 @@
                                 <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
                             
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-bold text-gray-800">{{ $hst }} Hari</span>
+                                <div class="text-xs text-gray-500 mt-0.5">Setelah Tanam (HST)</div>
+                            </td>
+
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $name = strtolower($detection->nutrientDeficiency->name);

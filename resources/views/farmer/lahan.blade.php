@@ -10,9 +10,9 @@
             <input type="text" placeholder="Cari nama lahan sawah..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm">
         </div>
         
-        <button onclick="openModal()" class="w-full md:w-auto bg-[#387F39] hover:bg-green-800 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center transform hover:-translate-y-0.5">
+        <a href="{{ route('farmer.lahan.create') }}" class="w-full md:w-auto bg-[#387F39] hover:bg-green-800 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center transform hover:-translate-y-0.5">
             <i class="fa-solid fa-plus mr-2"></i> Tambah Lahan Baru
-        </button>
+        </a>
     </div>
     
     @if($lands->isEmpty())
@@ -37,9 +37,9 @@
                         </p>
                     </div>
                     <div class="flex space-x-2">
-                        <button type="button" onclick="openEditModal('{{ $land->land_id }}', '{{ addslashes($land->name) }}', '{{ addslashes($land->location) }}')" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
+                        <a href="{{ route('farmer.lahan.edit', $land->land_id) }}" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
                             <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
+                        </a>
 
                         <form action="{{ route('farmer.lahan.destroy', $land->land_id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus lahan ini? Semua riwayat deteksi di lahan ini akan ikut terhapus permanen.');">
                             @csrf
@@ -54,7 +54,17 @@
                 <div class="space-y-3 text-sm text-gray-600 mb-6 relative z-10">
                     <div class="flex items-start">
                         <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center mr-3 flex-shrink-0"><i class="fa-solid fa-location-dot text-gray-400"></i></div>
-                        <p class="mt-1"><span class="font-medium text-gray-800">Lokasi:</span> <br> {{ $land->location ?? 'Belum ada detail lokasi' }}</p>
+                        <div class="mt-1">
+                            <span class="font-medium text-gray-800">Lokasi:</span> <br> 
+                            {{ $land->location ?? 'Belum ada detail lokasi' }}
+                            
+                            {{-- Tampilkan Koordinat Jika Ada --}}
+                            @if($land->latitude && $land->longitude)
+                            <div class="mt-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg inline-block">
+                                <i class="fa-solid fa-map-pin mr-1"></i> {{ $land->latitude }}, {{ $land->longitude }}
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 

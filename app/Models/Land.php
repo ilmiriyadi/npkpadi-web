@@ -16,6 +16,8 @@ class Land extends Model
         'name',
         'location',
         'planting_date',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [

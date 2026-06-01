@@ -14,6 +14,9 @@ class NutrientDeficiency extends Model
     protected $fillable = [
         'name',
         'solution',
+        'solution_vegetative',
+        'solution_generative',
+        'solution_ripening'
     ];
 
     // Relasi: Penyakit ini bisa muncul di banyak Deteksi

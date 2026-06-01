@@ -1,6 +1,6 @@
 @extends('layouts.farmer')
 
-@section('title', 'Riwayat Deteksi AI - NPK Padi')
+@section('title', 'Riwayat Deteksi - NPK Padi')
 @section('header_title', 'Riwayat Deteksi Nutrisi')
 
 @section('content')
@@ -8,7 +8,7 @@
         
         <div class="relative w-full md:w-96">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama lahan atau hasil AI..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama lahan atau hasil deteksi..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm">
         </div>
         
         <div class="flex space-x-3 w-full md:w-auto">
@@ -43,7 +43,7 @@
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Waktu Deteksi</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Lokasi Lahan</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Umur Padi (Saat Deteksi)</th>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis AI</th>
+                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap text-center">Aksi</th>
                     </tr>
                 </thead>

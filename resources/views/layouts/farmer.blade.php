@@ -69,7 +69,7 @@
                 <i class="fa-solid fa-house w-6 text-center text-lg mr-3"></i> Dashboard
             </a>
             
-            <a href="{{ route('farmer.lahan') }}" class="flex items-center px-4 py-3.5 rounded-xl font-medium transition-colors {{ request()->routeIs('farmer.lahan') ? 'text-green-700 bg-green-50' : 'text-gray-500 hover:text-green-600 hover:bg-green-50' }}">
+            <a href="{{ route('farmer.lahan') }}" class="flex items-center px-4 py-3.5 rounded-xl font-medium transition-colors {{ request()->routeIs('farmer.lahan*') ? 'text-green-700 bg-green-50' : 'text-gray-500 hover:text-green-600 hover:bg-green-50' }}">
                 <i class="fa-solid fa-map-location-dot w-6 text-center text-lg mr-3"></i> Kelola Lahan
             </a>
 
