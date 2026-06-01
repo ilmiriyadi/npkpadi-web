@@ -56,4 +56,12 @@ class User extends Authenticatable
         // Parameter: (NamaModel, foreign_key_di_tabel_lands, local_key_di_tabel_users)
         return $this->hasMany(Land::class, 'user_id', 'user_id');
     }
+
+    /**
+     * Relasi: 1 User (Petani) bisa punya banyak Deteksi melalui Lahan
+     */
+    public function detections()
+    {
+        return $this->hasManyThrough(Detection::class, Land::class, 'user_id', 'land_id', 'user_id', 'land_id');
+    }
 }

@@ -53,9 +53,9 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
                             
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                    <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover">
+                             <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
+                                    <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
                             
@@ -98,7 +98,7 @@
                             
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
-                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}')" 
+                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($detection->nutrientDeficiency->solution) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
                                     class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
                                     Detail Solusi
                                 </button>
@@ -137,7 +137,13 @@
                         </button>
                     </div>
 
-                    <div class="mt-4 flex flex-col items-center">
+                    <div class="mt-4 flex flex-col items-center w-full">
+                        <!-- Toggle Tab untuk gambar original vs segmentasi -->
+                        <div id="modal_image_tabs" class="flex space-x-2 mb-3 bg-gray-100 p-1 rounded-xl hidden">
+                            <button type="button" id="tab_btn_original" onclick="switchModalTab('original')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-gray-800 shadow-sm transition-colors">Asli</button>
+                            <button type="button" id="tab_btn_segmented" onclick="switchModalTab('segmented')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors">Segmentasi</button>
+                        </div>
+
                         <div class="w-full h-48 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 mb-4 relative">
                             <img id="modal_image" src="" alt="Daun Padi" class="w-full h-full object-cover">
                             <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold text-gray-800 shadow-sm">
@@ -171,15 +177,45 @@
 
 @section('scripts')
 <script>
-    function openDetailModal(imagePath, diseaseName, accuracy, solution) {
-        // Isi elemen HTML di dalam Modal dengan data dari tabel
+    let currentOriginalPath = '';
+    let currentSegmentedPath = '';
+
+    function openDetailModal(imagePath, diseaseName, accuracy, solution, segmentedImagePath = '') {
+        currentOriginalPath = imagePath;
+        currentSegmentedPath = segmentedImagePath;
+        
         document.getElementById('modal_image').src = imagePath;
         document.getElementById('modal_disease').innerText = diseaseName;
         document.getElementById('modal_accuracy').innerText = accuracy;
         document.getElementById('modal_solution').innerText = solution;
+
+        const tabs = document.getElementById('modal_image_tabs');
+        if (segmentedImagePath) {
+            tabs.classList.remove('hidden');
+            switchModalTab('segmented'); // Default ke segmentasi/highlight jika ada
+        } else {
+            tabs.classList.add('hidden');
+            switchModalTab('original');
+        }
         
         // Tampilkan Modal
         document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function switchModalTab(tab) {
+        const originalBtn = document.getElementById('tab_btn_original');
+        const segmentedBtn = document.getElementById('tab_btn_segmented');
+        const img = document.getElementById('modal_image');
+
+        if (tab === 'original') {
+            originalBtn.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-gray-800 shadow-sm transition-colors";
+            segmentedBtn.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors";
+            img.src = currentOriginalPath;
+        } else {
+            originalBtn.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors";
+            segmentedBtn.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-gray-800 shadow-sm transition-colors";
+            img.src = currentSegmentedPath;
+        }
     }
 
     function closeDetailModal() {
