@@ -379,19 +379,25 @@ class DashboardController extends Controller
     // Memproses perubahan data (Edit Lahan)
     public function farmerLahanUpdate(Request $request, $id)
     {
+        // 1. Tambahkan latitude & longitude di validasi
         $request->validate([
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
             'planting_date' => 'required|date',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         // Cari lahan berdasarkan ID dan pastikan itu milik petani yang sedang login
         $land = \App\Models\Land::where('land_id', $id)->where('user_id', Auth::id())->firstOrFail();
         
+        // 2. Tambahkan latitude & longitude di proses update database
         $land->update([
             'name' => $request->name,
             'location' => $request->location,
             'planting_date' => $request->planting_date,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
         ]);
 
         return redirect()->route('farmer.lahan')->with('success', 'Data lahan berhasil diperbarui!');
