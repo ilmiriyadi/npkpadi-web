@@ -56,7 +56,7 @@
                         $hst = intval($rawDays);
 
                         // Tentukan Fase dan Solusi Spesifik
-                        if ($hst <= 30) {
+                        if ($hst <= 40) {
                             $fase = "Fase Vegetatif ($hst HST)";
                             $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
                         } elseif ($hst <= 60) {
