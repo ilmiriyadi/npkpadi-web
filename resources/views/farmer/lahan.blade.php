@@ -60,9 +60,13 @@
                             
                             {{-- Tampilkan Koordinat Jika Ada --}}
                             @if($land->latitude && $land->longitude)
-                            <div class="mt-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg inline-block">
-                                <i class="fa-solid fa-map-pin mr-1"></i> {{ $land->latitude }}, {{ $land->longitude }}
-                            </div>
+                                <a href="https://www.google.com/maps?q={{ $land->latitude }},{{ $land->longitude }}" target="_blank" class="mt-2 inline-flex items-center text-xs font-semibold text-[#387F39] bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-lg transition-colors w-fit group">
+                                    <i class="fa-solid fa-map-location-dot mr-2 text-green-600 group-hover:scale-110 transition-transform"></i>
+                                    <span>
+                                        Buka Peta ({{ number_format($land->latitude, 4) }}, {{ number_format($land->longitude, 4) }})
+                                    </span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-[10px] opacity-70"></i>
+                                </a>
                             @endif
                         </div>
                     </div>
