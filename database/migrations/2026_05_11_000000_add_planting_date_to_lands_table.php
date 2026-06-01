@@ -9,12 +9,13 @@ return new class extends Migration
     /**
      * Tambah kolom planting_date ke tabel lands yang sudah ada.
      */
-    public function up(): void
-    {
-        Schema::table('lands', function (Blueprint $table) {
-            // Tambah nullable agar tidak break data yang sudah ada
-            $table->date('planting_date')->nullable()->after('location');
-        });
+    public function up(){
+        // Cek dulu apakah kolom planting_date SUDAH ADA atau BELUM
+        if (!Schema::hasColumn('lands', 'planting_date')) {
+            Schema::table('lands', function (Blueprint $table) {
+                $table->date('planting_date')->nullable()->after('location');
+            });
+        }
     }
 
     /**

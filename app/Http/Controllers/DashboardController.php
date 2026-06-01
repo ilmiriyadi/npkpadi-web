@@ -78,11 +78,17 @@ class DashboardController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'solution' => 'required|string',
+            'solution_vegetative' => 'nullable|string',
+            'solution_generative' => 'nullable|string',
+            'solution_ripening' => 'nullable|string',
         ]);
 
         \App\Models\NutrientDeficiency::create([
             'name' => $request->name,
             'solution' => $request->solution,
+            'solution_vegetative' => $request->solution_vegetative,
+            'solution_generative' => $request->solution_generative,
+            'solution_ripening' => $request->solution_ripening,
         ]);
 
         return redirect()->route('admin.datamaster')->with('success', 'Data Penyakit/Solusi baru berhasil ditambahkan!');
@@ -94,12 +100,18 @@ class DashboardController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'solution' => 'required|string',
+            'solution_vegetative' => 'nullable|string',
+            'solution_generative' => 'nullable|string',
+            'solution_ripening' => 'nullable|string',
         ]);
 
         $deficiency = \App\Models\NutrientDeficiency::findOrFail($id);
         $deficiency->update([
             'name' => $request->name,
             'solution' => $request->solution,
+            'solution_vegetative' => $request->solution_vegetative,
+            'solution_generative' => $request->solution_generative,
+            'solution_ripening' => $request->solution_ripening,
         ]);
 
         return redirect()->route('admin.datamaster')->with('success', 'Data Penyakit/Solusi berhasil diperbarui!');
@@ -322,6 +334,8 @@ class DashboardController extends Controller
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
             'planting_date' => 'required|date',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         // Simpan data ke tabel 'lands'
@@ -330,9 +344,24 @@ class DashboardController extends Controller
             'name' => $request->name,
             'location' => $request->location,
             'planting_date' => $request->planting_date,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
         ]);
 
         return redirect()->route('farmer.lahan')->with('success', 'Lahan baru berhasil ditambahkan!');
+    }
+
+    // Menampilkan halaman form tambah lahan
+    public function farmerLahanCreate()
+    {
+        return view('farmer.lahan_create');
+    }
+
+    // Menampilkan halaman form edit lahan
+    public function farmerLahanEdit($id)
+    {
+        $land = \App\Models\Land::where('user_id', \Illuminate\Support\Facades\Auth::id())->findOrFail($id);
+        return view('farmer.lahan_edit', compact('land'));
     }
 
     // Memproses perubahan data (Edit Lahan)

@@ -65,9 +65,13 @@ Route::prefix('farmer')->name('farmer.')->middleware('auth')->group(function () 
     // Rute untuk Proses Simpan Lahan
     Route::post('/lahan', [DashboardController::class, 'farmerLahanStore'])->name('lahan.store');
     
-    // Rute untuk Edit dan Hapus Lahan
+     // Rute untuk Edit dan Hapus Lahan
     Route::put('/lahan/{id}', [DashboardController::class, 'farmerLahanUpdate'])->name('lahan.update');
     Route::delete('/lahan/{id}', [DashboardController::class, 'farmerLahanDestroy'])->name('lahan.destroy');
+
+    // Halaman Tambah dan Edit Lahan
+    Route::get('/lahan/create', [DashboardController::class, 'farmerLahanCreate'])->name('lahan.create');
+    Route::get('/lahan/{id}/edit', [DashboardController::class, 'farmerLahanEdit'])->name('lahan.edit');
 
     // Halaman Riwayat Deteksi
     Route::get('/riwayat', [DashboardController::class, 'farmerHistory'])->name('history');
