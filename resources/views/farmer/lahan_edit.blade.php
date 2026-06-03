@@ -20,13 +20,9 @@
         #map { height: 350px !important; }
     }
     
-    #map img {
+    .leaflet-container img {
         max-width: none !important;
         max-height: none !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
 </style>
 
@@ -62,8 +58,8 @@
 
             <div class="lg:col-span-7 flex flex-col">
                 <div class="mb-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta <span class="text-red-500">*</span></label>
-                    <p class="text-xs text-gray-500">Geser peta dan <b>klik lokasi baru</b> jika ingin mengubah letak sawah.</p>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
+                    <p class="text-xs text-gray-500 leading-relaxed">Geser peta dan klik lokasi baru jika ingin mengubah letak sawah. <br><span class="text-blue-600 font-medium">Boleh dibiarkan jika tidak ingin mengatur koordinat.</span></p>
                 </div>
                 
                 <div id="map" class="flex-grow shadow-inner"></div>
@@ -71,11 +67,11 @@
                 <div class="flex flex-col sm:flex-row gap-3 pt-3">
                     <div class="w-full sm:w-1/2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Latitude</label>
-                        <input type="text" name="latitude" id="lat" value="{{ $land->latitude }}" readonly required class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
+                        <input type="text" name="latitude" id="lat" value="{{ $land->latitude }}" readonly placeholder="Belum diatur" class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
                     </div>
                     <div class="w-full sm:w-1/2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Longitude</label>
-                        <input type="text" name="longitude" id="lng" value="{{ $land->longitude }}" readonly required class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
+                        <input type="text" name="longitude" id="lng" value="{{ $land->longitude }}" readonly placeholder="Belum diatur" class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
                     </div>
                 </div>
             </div>
@@ -104,8 +100,7 @@
         // Ambil data koordinat lama dari database (jika ada)
         const dbLat = {{ $land->latitude ?? 'null' }};
         const dbLng = {{ $land->longitude ?? 'null' }};
-        
-        // Koordinat default (Kecamatan Belawang, Batola)
+
         const defaultLat = -3.1145; 
         const defaultLng = 114.6030;
 
@@ -118,14 +113,26 @@
         const map = L.map('map').setView([startLat, startLng], startZoom);
         let marker = null;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-            maxZoom: 19
+        // UPGRADE 1: Menggunakan Peta Satelit (Google Hybrid)
+        L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Maps'
         }).addTo(map);
+
+        // UPGRADE 2: Membuat Pin Marker Warna Hijau
+        const greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
         // Jika data dari database ada, langsung pasang pin/marker
         if (dbLat !== null && dbLng !== null) {
-            marker = L.marker([dbLat, dbLng]).addTo(map);
+            marker = L.marker([dbLat, dbLng], {icon: greenIcon}).addTo(map);
         }
 
         // Event listener jika user mengklik peta untuk mengubah lokasi
@@ -139,7 +146,7 @@
             if (marker) {
                 marker.setLatLng(e.latlng);
             } else {
-                marker = L.marker(e.latlng).addTo(map);
+                marker = L.marker(e.latlng, {icon: greenIcon}).addTo(map);
             }
         });
         
@@ -148,4 +155,5 @@
         }, 500);
     });
 </script>
+
 @endsection

@@ -55,7 +55,7 @@
                         $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
                         $hst = intval($rawDays);
 
-                        // Tentukan Fase dan Solusi Spesifik
+                        // Tentukan Fase dan Saran Spesifik
                         if ($hst <= 40) {
                             $fase = "Fase Vegetatif ($hst HST)";
                             $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
@@ -67,7 +67,7 @@
                             $solusiSpesifik = $detection->nutrientDeficiency->solution_ripening;
                         }
 
-                        // Gabungkan Teks Solusi
+                        // Gabungkan Teks Saran Spesifik dengan Umum
                         $teksSolusi = $solusiSpesifik ? "[$fase] - " . $solusiSpesifik : $detection->nutrientDeficiency->solution;
                     @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -119,8 +119,8 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button type="button" 
                                     onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
-                                    class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Solusi">
-                                    Detail Solusi
+                                    class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Saran Penanganan">
+                                    Saran
                                 </button>
                             </td>
                         </tr>
@@ -151,7 +151,7 @@
             <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-gray-100">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl leading-6 font-bold text-gray-900" id="modal-title">Hasil Analisis & Solusi</h3>
+                        <h3 class="text-xl leading-6 font-bold text-gray-900" id="modal-title">Hasil Analisis & Saran Penanganan</h3>
                         <button type="button" onclick="closeDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
                             <i class="fa-solid fa-xmark text-xl"></i>
                         </button>

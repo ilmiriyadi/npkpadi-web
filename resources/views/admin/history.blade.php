@@ -37,6 +37,7 @@
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Foto Daun</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Pemilik Lahan</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Waktu Deteksi</th>
+                        <th class="px-6 py-5 font-semibold whitespace-nowrap">Umur Padi (Saat Deteksi)</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap">Hasil Analisis</th>
                         <th class="px-6 py-5 font-semibold whitespace-nowrap text-center">Aksi</th>
                     </tr>
@@ -44,11 +45,11 @@
                 <tbody class="text-sm divide-y divide-gray-100">
                     @forelse($detections as $index => $detection)
                         @php
-                            // LOGIKA PINTAR UMUR & SOLUSI
+                            // LOGIKA PINTAR UMUR & SARAN
                             $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
                             $hst = intval($rawDays);
 
-                            // Tentukan Fase dan Solusi Spesifik
+                            // Tentukan Fase dan Saran Spesifik
                             if ($hst <= 40) {
                                 $fase = "Fase Vegetatif ($hst HST)";
                                 $solusiSpesifik = $detection->nutrientDeficiency->solution_vegetative;
@@ -60,7 +61,7 @@
                                 $solusiSpesifik = $detection->nutrientDeficiency->solution_ripening;
                             }
 
-                            // Gabungkan Teks Solusi
+                            // Gabungkan Teks Saran
                             $teksSolusi = $solusiSpesifik ? "[$fase] - " . $solusiSpesifik : $detection->nutrientDeficiency->solution;
                         @endphp
 
@@ -109,7 +110,7 @@
                                 <button type="button" 
                                     onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ addslashes($teksSolusi) }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
                                     class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
-                                    Detail Solusi
+                                    Saran
                                 </button>
                             </td>
                         </tr>
@@ -139,7 +140,7 @@
             <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-gray-100">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl leading-6 font-bold text-gray-900">Hasil Analisis & Solusi</h3>
+                        <h3 class="text-xl leading-6 font-bold text-gray-900">Hasil Analisis & Saran Penanganan</h3>
                         <button type="button" onclick="closeDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
                             <i class="fa-solid fa-xmark text-xl"></i>
                         </button>
