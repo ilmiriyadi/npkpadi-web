@@ -20,13 +20,9 @@
         #map { height: 350px !important; }
     }
     
-    #map img {
+    .leaflet-container img {
         max-width: none !important;
         max-height: none !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
 </style>
 
@@ -34,7 +30,7 @@
     
     <div class="mb-6 pb-4 border-b border-gray-100">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800">Detail Lahan Sawah</h2>
-        <p class="text-gray-500 text-sm mt-1">Lengkapi informasi di bawah ini dan tandai titik lokasi secara presisi.</p>
+        <p class="text-gray-500 text-sm mt-1">Lengkapi informasi di bawah ini.</p>
     </div>
 
     <form action="{{ route('farmer.lahan.store') }}" method="POST">
@@ -61,8 +57,8 @@
 
             <div class="lg:col-span-7 flex flex-col">
                 <div class="mb-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta <span class="text-red-500">*</span></label>
-                    <p class="text-xs text-gray-500">Geser peta dan <b>klik lokasi persis</b> sawah Anda.</p>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
+                    <p class="text-xs text-gray-500 leading-relaxed">Geser peta dan klik lokasi persis sawah Anda. <br><span class="text-[#387F39] font-medium bg-green-50 px-1 py-0.5 rounded">Biarkan kosong jika Anda kesulitan menemukan titik lokasinya.</span></p>
                 </div>
                 
                 <div id="map" class="flex-grow shadow-inner"></div>
@@ -70,11 +66,11 @@
                 <div class="flex flex-col sm:flex-row gap-3 pt-3">
                     <div class="w-full sm:w-1/2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Latitude</label>
-                        <input type="text" name="latitude" id="lat" readonly required class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
+                        <input type="text" name="latitude" id="lat" readonly placeholder="Belum diatur" class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
                     </div>
                     <div class="w-full sm:w-1/2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Longitude</label>
-                        <input type="text" name="longitude" id="lng" readonly required class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
+                        <input type="text" name="longitude" id="lng" readonly placeholder="Belum diatur" class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono outline-none cursor-not-allowed">
                     </div>
                 </div>
             </div>
@@ -106,10 +102,22 @@
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
         let marker = null;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-            maxZoom: 19
+        // UPGRADE 1: Menggunakan Peta Satelit (Google Hybrid)
+        L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Maps'
         }).addTo(map);
+
+        // UPGRADE 2: Membuat Pin Marker Warna Hijau
+        const greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
         map.on('click', function(e) {
             const clickedLat = e.latlng.lat.toFixed(8);
@@ -121,7 +129,8 @@
             if (marker) {
                 marker.setLatLng(e.latlng);
             } else {
-                marker = L.marker(e.latlng).addTo(map);
+                // Memasang Pin Hijau saat di-klik
+                marker = L.marker(e.latlng, {icon: greenIcon}).addTo(map);
             }
         });
         
