@@ -233,7 +233,9 @@ class SyncController extends Controller
                     'solution_generative'  => $d->solution_generative ?? null,
                     'solution_ripening'    => $d->solution_ripening ?? null,
                 ];
-            });
+            })
+            ->unique('label')
+            ->values();
 
         return response()->json([
             'success'      => true,
