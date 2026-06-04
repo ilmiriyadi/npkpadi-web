@@ -13,15 +13,16 @@ use App\Models\User;
  * =====================================================================
  * SyncController — API untuk menerima data dari Raspberry Pi
  * =====================================================================
- * 
+ *
  * Controller ini menangani komunikasi machine-to-machine antara
  * Raspberry Pi (Flask) dan Laravel VPS.
- * 
+ *
  * Endpoints:
- *   POST /api/sync/detections  → Terima batch hasil deteksi dari Pi
- *   GET  /api/sync/lands       → Kirim daftar lahan ke Pi
- *   GET  /api/sync/farmers     → Kirim daftar petani ke Pi
- * 
+ *   POST /api/sync/detections    → Terima batch hasil deteksi dari Pi
+ *   GET  /api/sync/lands         → Kirim daftar lahan ke Pi
+ *   GET  /api/sync/farmers       → Kirim daftar petani ke Pi
+ *   GET  /api/sync/deficiencies  → Kirim data penyakit & saran solusi ke Pi
+ *
  * Auth: Bearer token (SYNC_API_TOKEN di .env)
  * =====================================================================
  */
@@ -171,7 +172,7 @@ class SyncController extends Controller
 
     /**
      * GET /api/sync/farmers
-     * 
+     *
      * Mengirim daftar user petani ke Raspberry Pi.
      * Pi menampilkan list ini untuk dipilih saat startup.
      * Petani hanya bisa ditambahkan via admin panel di website.
@@ -186,6 +187,57 @@ class SyncController extends Controller
         return response()->json([
             'success' => true,
             'farmers' => $farmers,
+        ]);
+    }
+
+    /**
+     * GET /api/sync/deficiencies
+     *
+     * Mengirim data penyakit defisiensi nutrisi beserta SARAN SOLUSI ke Pi.
+     *
+     * Pi menyimpan data ini ke tabel `local_deficiencies` di SQLite lokal.
+     * Setiap kali admin mengedit saran solusi di halaman Data Master website,
+     * perubahan akan otomatis tersinkronisasi ke Pi pada sync berikutnya (tiap 60 detik).
+     *
+     * Response:
+     * {
+     *   "success": true,
+     *   "deficiencies": [
+     *     {
+     *       "id": 1,
+     *       "name": "Defisiensi Nitrogen (N)",
+     *       "label": "Nitrogen (N)",
+     *       "solution": "Berikan pupuk Urea atau ZA sesuai dosis anjuran."
+     *     },
+     *     ...
+     *   ]
+     * }
+     */
+    public function getDeficiencies()
+    {
+        $deficiencies = NutrientDeficiency::all()
+            ->map(function ($d) {
+                // Ekstrak label singkat dari nama lengkap.
+                // Contoh: "Defisiensi Nitrogen (N)" → label = "Nitrogen (N)"
+                $label = $d->name;
+                if (preg_match('/Defisiensi\s+(.+)/i', $d->name, $matches)) {
+                    $label = trim($matches[1]);
+                }
+
+                return [
+                    'id'                   => $d->nutrient_deficiency_id,
+                    'name'                 => $d->name,
+                    'label'                => $label,
+                    'solution'             => $d->solution ?? '',
+                    'solution_vegetative'  => $d->solution_vegetative ?? null,
+                    'solution_generative'  => $d->solution_generative ?? null,
+                    'solution_ripening'    => $d->solution_ripening ?? null,
+                ];
+            });
+
+        return response()->json([
+            'success'      => true,
+            'deficiencies' => $deficiencies,
         ]);
     }
 

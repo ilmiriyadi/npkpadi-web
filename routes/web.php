@@ -108,6 +108,10 @@ Route::prefix('api/sync')->middleware('api.auth')->group(function () {
     // Kirim daftar petani ke Pi (untuk login screen)
     Route::get('/farmers', [SyncController::class, 'getFarmers'])->name('sync.farmers');
 
+    // Kirim data defisiensi & saran solusi ke Pi (agar solusi yang diedit admin di website
+    // otomatis tersinkronisasi ke semua Raspberry Pi tanpa perlu update kode)
+    Route::get('/deficiencies', [SyncController::class, 'getDeficiencies'])->name('sync.deficiencies');
+
 });
 
 require __DIR__.'/auth.php';
