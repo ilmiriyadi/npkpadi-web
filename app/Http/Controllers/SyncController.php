@@ -159,7 +159,7 @@ class SyncController extends Controller
 
         $userId = $request->input('user_id');
         $lands  = Land::where('user_id', $userId)
-                      ->select('land_id', 'name', 'location')
+                      ->select('land_id', 'name', 'location', 'planting_date')
                       ->orderBy('name')
                       ->get();
 
