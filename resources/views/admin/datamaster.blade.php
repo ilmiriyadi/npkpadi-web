@@ -18,7 +18,7 @@
             </div>
             <div class="ml-3">
                 <p class="text-sm text-blue-700 font-medium">
-                    Info: "Nama Kondisi" telah dikunci agar selalu sinkron dengan label/kelas yang dihasilkan oleh model AI (CNN ResNet18). Anda hanya dapat memperbarui bagian rincian rekomendasi/saran penanganan.
+                    Info: "Nama Kondisi" telah dikunci agar selalu sinkron dengan label/kelas yang dihasilkan oleh model AI (CNN MobileNetV2). Anda hanya dapat memperbarui bagian rincian rekomendasi/saran penanganan.
                 </p>
             </div>
         </div>

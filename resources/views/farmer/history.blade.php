@@ -172,7 +172,7 @@
                         </div>
 
                         <div class="w-full text-center p-4 bg-gray-50 rounded-2xl mb-4 border border-gray-100">
-                            <p class="text-sm text-gray-500 mb-1">Diagnosis Penyakit (CNN ResNet18):</p>
+                            <p class="text-sm text-gray-500 mb-1">Diagnosis Penyakit (CNN MobileNetV2):</p>
                             <h4 id="modal_disease" class="text-lg font-bold text-gray-800"></h4>
                         </div>
 
