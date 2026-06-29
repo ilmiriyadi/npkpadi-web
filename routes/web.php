@@ -9,7 +9,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// 1. Jalur ini berfungsi sebagai "Satpam" yang mengecek Role
+// 1. Jalur ini berfungsi sebagai "Satpam" yang mengecek Role pertama kali login
 Route::get('/dashboard', function () {
     if (auth()->user()->role === 'admin') {
         return redirect('/admin/dashboard');
@@ -21,8 +21,7 @@ Route::get('/dashboard', function () {
 // ==========================================
 // RUTE KHUSUS ADMIN
 // ==========================================
-// Kita bungkus semua jalur Admin agar otomatis punya awalan /admin dan bernama admin.
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     
     // Ruangan Khusus Admin
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
@@ -54,7 +53,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 // ==========================================
 // RUTE KHUSUS PETANI
 // ==========================================
-Route::prefix('farmer')->name('farmer.')->middleware('auth')->group(function () {
+    Route::prefix('farmer')->name('farmer.')->middleware(['auth', 'role:farmer'])->group(function () {
     
     // Halaman Dashboard Utama
     Route::get('/dashboard', [DashboardController::class, 'farmer'])->name('dashboard');
@@ -95,8 +94,6 @@ Route::middleware('auth')->group(function () {
 // ==========================================
 // RUTE API SYNC DARI RASPBERRY PI
 // ==========================================
-// Endpoint untuk komunikasi machine-to-machine (Pi → VPS).
-// Menggunakan Bearer token auth, bukan session/CSRF.
 Route::prefix('api/sync')->middleware('api.auth')->group(function () {
 
     // Terima batch hasil deteksi dari Pi
@@ -108,8 +105,7 @@ Route::prefix('api/sync')->middleware('api.auth')->group(function () {
     // Kirim daftar petani ke Pi (untuk login screen)
     Route::get('/farmers', [SyncController::class, 'getFarmers'])->name('sync.farmers');
 
-    // Kirim data defisiensi & saran solusi ke Pi (agar solusi yang diedit admin di website
-    // otomatis tersinkronisasi ke semua Raspberry Pi tanpa perlu update kode)
+    // Kirim data defisiensi & saran solusi ke Pi
     Route::get('/deficiencies', [SyncController::class, 'getDeficiencies'])->name('sync.deficiencies');
 
 });
