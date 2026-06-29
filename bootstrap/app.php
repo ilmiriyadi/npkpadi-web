@@ -11,17 +11,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Alias middleware API auth untuk Raspberry Pi sync
+        
+        // Gabungan Alias Middleware (API Alat & Pengecekan Role Web)
         $middleware->alias([
             'api.auth' => \App\Http\Middleware\ApiAuthMiddleware::class,
+            'role'     => \App\Http\Middleware\CheckRole::class,
         ]);
 
         // Rute API sync tidak pakai CSRF (machine-to-machine)
         $middleware->validateCsrfTokens(except: [
             'api/sync/*',
         ]);
+        
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
-
