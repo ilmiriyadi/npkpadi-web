@@ -16,6 +16,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 1. Buat 3 Data Penyakit Utama
+        $diseases = [
+            'Kekurangan Nitrogen (N)',
+            'Kekurangan Fosfor (P)',
+            'Kekurangan Kalium (K)'
+        ];
+
+        foreach($diseases as $disease) {
+            NutrientDeficiency::create([
+                'name' => $disease,
+                'saran_umum_unggul' => 'Saran umum untuk bibit unggul belum diisi.',
+                'saran_umum_lokal'  => 'Saran umum untuk bibit lokal belum diisi.'
+            ]);
+        }
+
         $this->call([
             UserSeeder::class,           // Akun Admin dibuat pertama
             NutrientDeficiencySeeder::class, // Data Master Penyakit

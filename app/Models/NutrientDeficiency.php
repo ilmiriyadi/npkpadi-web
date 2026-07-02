@@ -2,26 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NutrientDeficiency extends Model
 {
-    use HasFactory;
-
+    // Beritahu Laravel nama ID kustom kita
     protected $primaryKey = 'nutrient_deficiency_id';
-
+    
+    // Kolom yang boleh diisi
     protected $fillable = [
-        'name',
-        'solution',
-        'solution_vegetative',
-        'solution_generative',
-        'solution_ripening'
+        'name', 
+        'saran_umum_unggul', 
+        'saran_umum_lokal'
     ];
 
-    // Relasi: Penyakit ini bisa muncul di banyak Deteksi
-    public function detections()
+    // Relasi ke tabel solusi (fase umur)
+    public function solutions()
     {
-        return $this->hasMany(Detection::class, 'nutrient_deficiency_id', 'nutrient_deficiency_id');
+        return $this->hasMany(DeficiencySolution::class, 'nutrient_deficiency_id', 'nutrient_deficiency_id');
     }
 }

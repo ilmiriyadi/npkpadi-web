@@ -79,6 +79,13 @@
                     </div>
                 </div>
 
+                <div class="space-y-3 text-sm text-gray-600 mb-6 relative z-10">
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center mr-3 flex-shrink-0"><i class="fa-solid fa-location-dot text-gray-400"></i></div>
+                        <p class="mt-1"><span class="font-medium text-gray-800">Jenis Bibit:</span> <br> {{ $land->seed_type == 'unggul' ? 'Bibit Unggul' : 'Bibit Lokal' }}</p>
+                    </div>
+                </div>
+
                 <a href="{{ route('farmer.history') }}" class="block w-full text-center bg-green-50 hover:bg-[#C8E6C9] text-green-800 font-semibold py-3 rounded-xl transition-colors text-sm relative z-10">
                     Lihat Data Deteksi <i class="fa-solid fa-arrow-right ml-2"></i>
                 </a>

@@ -16,6 +16,7 @@ class Land extends Model
         'name',
         'location',
         'planting_date',
+        'seed_type',
         'latitude',
         'longitude',
     ];
