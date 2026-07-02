@@ -27,41 +27,46 @@ class NutrientDeficiencyController extends Controller
         // Cari data berdasarkan nutrient_deficiency_id
         $deficiency = NutrientDeficiency::findOrFail($id);
 
-        // 2. Update Saran Umum di tabel Induk
-        $deficiency->update([
-            'saran_umum_unggul' => $request->saran_umum_unggul,
-            'saran_umum_lokal'  => $request->saran_umum_lokal,
-        ]);
+        try {
+            // 2. Update Saran Umum di tabel Induk
+            $deficiency->update([
+                'saran_umum_unggul' => $request->saran_umum_unggul,
+                'saran_umum_lokal'  => $request->saran_umum_lokal,
+            ]);
 
-        // 3. Bersihkan fase HST lama
-        $deficiency->solutions()->delete();
+            // 3. Bersihkan fase HST lama
+            $deficiency->solutions()->delete();
 
-        // 4. Simpan Fase HST Bibit Unggul (Jika lolos validasi)
-        if ($request->has('unggul_solutions') && is_array($request->unggul_solutions)) {
-            foreach ($request->unggul_solutions as $sol) {
-                if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
-                    $deficiency->solutions()->create([
-                        'seed_type'       => 'unggul',
-                        'min_hst'         => $sol['min_hst'],
-                        'max_hst'         => $sol['max_hst'],
-                        'solution_detail' => $sol['detail'] ?? '',
-                    ]);
+            // 4. Simpan Fase HST Bibit Unggul (Jika lolos validasi)
+            if ($request->has('unggul_solutions') && is_array($request->unggul_solutions)) {
+                foreach ($request->unggul_solutions as $sol) {
+                    if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
+                        $deficiency->solutions()->create([
+                            'seed_type'       => 'unggul',
+                            'min_hst'         => (int) $sol['min_hst'],
+                            'max_hst'         => (int) $sol['max_hst'],
+                            'solution_detail' => $sol['detail'] ?? '',
+                        ]);
+                    }
                 }
             }
-        }
 
-        // 5. Simpan Fase HST Bibit Lokal (Jika lolos validasi)
-        if ($request->has('lokal_solutions') && is_array($request->lokal_solutions)) {
-            foreach ($request->lokal_solutions as $sol) {
-                if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
-                    $deficiency->solutions()->create([
-                        'seed_type'       => 'lokal',
-                        'min_hst'         => $sol['min_hst'],
-                        'max_hst'         => $sol['max_hst'],
-                        'solution_detail' => $sol['detail'] ?? '',
-                    ]);
+            // 5. Simpan Fase HST Bibit Lokal (Jika lolos validasi)
+            if ($request->has('lokal_solutions') && is_array($request->lokal_solutions)) {
+                foreach ($request->lokal_solutions as $sol) {
+                    if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
+                        $deficiency->solutions()->create([
+                            'seed_type'       => 'lokal',
+                            'min_hst'         => (int) $sol['min_hst'],
+                            'max_hst'         => (int) $sol['max_hst'],
+                            'solution_detail' => $sol['detail'] ?? '',
+                        ]);
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            // Tangkap pesan error aslinya agar tampil di layar admin, bukan layar 500
+            return redirect()->back()->with('error', 'SERVER ERROR: ' . $e->getMessage() . ' di baris ' . $e->getLine());
         }
 
         return redirect()->route('admin.datamaster')->with('success', 'Rincian saran penanganan berhasil diperbarui!');
