@@ -37,7 +37,7 @@
                         </p>
                     </div>
                     <div class="flex space-x-2">
-                        <a href="{{ route('farmer.lahan.edit', $land->land_id) }}" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
+                        <a href="#" onclick="event.preventDefault(); openEditModal({{ $land->land_id }}, '{{ addslashes($land->name) }}', '{{ addslashes($land->location) }}', '{{ $land->planting_date ? \Carbon\Carbon::parse($land->planting_date)->format('Y-m-d') : '' }}', '{{ $land->seed_type }}')" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
 
@@ -131,6 +131,16 @@
                                 <input type="date" name="planting_date" id="planting_date" required
                                     class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm transition-colors">
                             </div>
+
+                            <!-- Input Jenis Bibit (Tambah) -->
+                            <div>
+                                <label for="seed_type" class="block text-sm font-bold text-gray-700 mb-1">Jenis Bibit <span class="text-red-500">*</span></label>
+                                <select name="seed_type" id="seed_type" required
+                                    class="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm transition-colors">
+                                    <option value="unggul">Unggul</option>
+                                    <option value="lokal">Lokal</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -175,6 +185,13 @@
                                 <label for="edit_planting_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tanam <span class="text-red-500">*</span></label>
                                 <input type="date" name="planting_date" id="edit_planting_date" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
                             </div>
+                            <div>
+                                <label for="edit_seed_type" class="block text-sm font-medium text-gray-700 mb-1">Jenis Bibit <span class="text-red-500">*</span></label>
+                                <select name="seed_type" id="edit_seed_type" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                                    <option value="unggul">Unggul</option>
+                                    <option value="lokal">Lokal</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -195,7 +212,7 @@
     function closeModal() { document.getElementById('lahanModal').classList.add('hidden'); }
 
     // TAMBAHKAN Script untuk Modal Edit ini:
-    function openEditModal(id, name, location, planting_date) {
+    function openEditModal(id, name, location, planting_date, seed_type) {
         // 1. Ubah alamat tujuan form sesuai ID lahan yang diklik
         document.getElementById('editLahanForm').action = '/farmer/lahan/' + id;
         
@@ -203,6 +220,7 @@
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_location').value = location;
         document.getElementById('edit_planting_date').value = planting_date;
+        document.getElementById('edit_seed_type').value = seed_type;
         
         // 3. Tampilkan modalnya
         document.getElementById('editLahanModal').classList.remove('hidden');

@@ -37,6 +37,17 @@
         @csrf
         @method('PUT')
         
+        <style>
+            .peer:checked ~ span {
+                color: #387F39;
+                font-weight: 700;
+            }
+            label:has(input.peer:checked) {
+                border-color: #387F39;
+                background-color: #f0fdf4; /* green-50 */
+            }
+        </style>
+        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mb-6">
             
             <div class="lg:col-span-5 space-y-4 md:space-y-5">

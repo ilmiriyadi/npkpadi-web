@@ -159,7 +159,7 @@ class SyncController extends Controller
 
         $userId = $request->input('user_id');
         $lands  = Land::where('user_id', $userId)
-                      ->select('land_id', 'name', 'location', 'planting_date')
+                      ->select('land_id', 'name', 'location', 'planting_date', 'seed_type')
                       ->orderBy('name')
                       ->get();
 
@@ -215,23 +215,32 @@ class SyncController extends Controller
      */
     public function getDeficiencies()
     {
-        $deficiencies = NutrientDeficiency::all()
+        $deficiencies = NutrientDeficiency::with('solutions')->get()
             ->map(function ($d) {
                 // Ekstrak label singkat dari nama lengkap.
-                // Contoh: "Defisiensi Nitrogen (N)" → label = "Nitrogen (N)"
+                // Contoh: "Defisiensi Nitrogen (N)" -> label = "Nitrogen (N)"
                 $label = $d->name;
                 if (preg_match('/Defisiensi\s+(.+)/i', $d->name, $matches)) {
                     $label = trim($matches[1]);
+                }
+
+                $solutionsData = [];
+                foreach ($d->solutions as $sol) {
+                    $solutionsData[] = [
+                        'seed_type' => $sol->seed_type,
+                        'min_hst' => $sol->min_hst,
+                        'max_hst' => $sol->max_hst,
+                        'solution_detail' => $sol->solution_detail,
+                    ];
                 }
 
                 return [
                     'id'                   => $d->nutrient_deficiency_id,
                     'name'                 => $d->name,
                     'label'                => $label,
-                    'solution'             => $d->solution ?? '',
-                    'solution_vegetative'  => $d->solution_vegetative ?? null,
-                    'solution_generative'  => $d->solution_generative ?? null,
-                    'solution_ripening'    => $d->solution_ripening ?? null,
+                    'saran_umum_unggul'    => $d->saran_umum_unggul ?? '',
+                    'saran_umum_lokal'     => $d->saran_umum_lokal ?? '',
+                    'solutions'            => $solutionsData,
                 ];
             })
             ->unique('label')

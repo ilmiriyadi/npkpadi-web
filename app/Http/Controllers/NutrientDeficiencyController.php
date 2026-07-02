@@ -39,7 +39,7 @@ class NutrientDeficiencyController extends Controller
         // 4. Simpan Fase HST Bibit Unggul (Jika lolos validasi)
         if ($request->has('unggul_solutions')) {
             foreach ($request->unggul_solutions as $sol) {
-                if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
+                if(isset($sol['min_hst']) && isset($sol['max_hst']) && isset($sol['detail'])) {
                     $deficiency->solutions()->create([
                         'seed_type'       => 'unggul',
                         'min_hst'         => $sol['min_hst'],
@@ -53,7 +53,7 @@ class NutrientDeficiencyController extends Controller
         // 5. Simpan Fase HST Bibit Lokal (Jika lolos validasi)
         if ($request->has('lokal_solutions')) {
             foreach ($request->lokal_solutions as $sol) {
-                if(isset($sol['min_hst']) && isset($sol['max_hst'])) {
+                if(isset($sol['min_hst']) && isset($sol['max_hst']) && isset($sol['detail'])) {
                     $deficiency->solutions()->create([
                         'seed_type'       => 'lokal',
                         'min_hst'         => $sol['min_hst'],
