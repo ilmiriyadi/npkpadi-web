@@ -346,6 +346,7 @@ class DashboardController extends Controller
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
             'planting_date' => 'required|date',
+            'seed_type' => 'required|in:unggul,lokal',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
@@ -356,6 +357,7 @@ class DashboardController extends Controller
             'name' => $request->name,
             'location' => $request->location,
             'planting_date' => $request->planting_date,
+            'seed_type' => $request->seed_type,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
@@ -384,6 +386,7 @@ class DashboardController extends Controller
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
             'planting_date' => 'required|date',
+            'seed_type' => 'required|in:unggul,lokal',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
@@ -396,6 +399,7 @@ class DashboardController extends Controller
             'name' => $request->name,
             'location' => $request->location,
             'planting_date' => $request->planting_date,
+            'seed_type' => $request->seed_type,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

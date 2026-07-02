@@ -7,9 +7,21 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div>
             <h2 class="text-xl font-bold text-gray-800">Daftar Penyakit & Saran Penanganan</h2>
-            <p class="text-sm text-gray-500 mt-1">Kelola rekomendasi penanganan 3 fase umur yang akan dibaca oleh petani.</p>
+            <p class="text-gray-500 text-sm mt-1">Kelola saran penanganan berdasarkan jenis bibit yang akan dibaca oleh petani.</p>
         </div>
     </div>
+
+    @if(session('success'))
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg shadow-sm font-medium">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg shadow-sm font-medium">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-xl">
         <div class="flex">
@@ -17,157 +29,200 @@
                 <i class="fa-solid fa-circle-info text-blue-400"></i>
             </div>
             <div class="ml-3">
-                <p class="text-sm text-blue-700 font-medium">
-                    Info: "Nama Kondisi" telah dikunci agar selalu sinkron dengan label/kelas yang dihasilkan oleh model AI (CNN MobileNetV2). Anda hanya dapat memperbarui bagian rincian rekomendasi/saran penanganan.
-                </p>
+                <p class="text-sm text-blue-700">Info: "Nama Kondisi" telah dikunci agar selalu sinkron dengan label kelas AI (MobileNetV2). Anda hanya dapat memperbarui rincian saran penanganan.</p>
             </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
         <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 text-gray-600 text-sm border-b border-gray-100">
-                    <tr>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap w-16 text-center">ID</th>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap w-48">Nama Kondisi</th>
-                        <th class="px-6 py-5 font-semibold">Rincian Saran (Berdasarkan Umur / HST)</th>
-                        <th class="px-6 py-5 font-semibold whitespace-nowrap text-center w-32">Aksi</th>
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500 text-sm">
+                        <th class="py-4 px-6 font-semibold w-16">ID</th>
+                        <th class="py-4 px-6 font-semibold">Nama Kondisi</th>
+                        <th class="py-4 px-6 font-semibold text-center w-32">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm divide-y divide-gray-100">
-                    @forelse($deficiencies as $data)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-center font-bold text-gray-500">{{ $data->nutrient_deficiency_id }}</td>
-                            
-                            <td class="px-6 py-4 font-semibold text-gray-800 align-top pt-5">
-                                @if(str_contains(strtolower($data->name), 'sehat'))
-                                    <span class="text-green-600"><i class="fa-solid fa-circle-check mr-1"></i> {{ $data->name }}</span>
-                                @else
-                                    <span class="text-red-500">{{ $data->name }}</span>
-                                @endif
-                            </td>
-                            
-                            <td class="px-6 py-4 text-gray-600">
-                                <div class="space-y-3">
-                                    <div>
-                                        <span class="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-md mb-1">Saran Umum</span>
-                                        <p class="text-sm leading-relaxed">{{ $data->solution }}</p>
-                                    </div>
-                                    @if($data->solution_vegetative)
-                                    <div>
-                                        <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-md mb-1">Fase Vegetatif (0-40 HST)</span>
-                                        <p class="text-sm leading-relaxed">{{ $data->solution_vegetative }}</p>
-                                    </div>
-                                    @endif
-                                    @if($data->solution_generative)
-                                    <div>
-                                        <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-md mb-1">Fase Generatif (41-60 HST)</span>
-                                        <p class="text-sm leading-relaxed">{{ $data->solution_generative }}</p>
-                                    </div>
-                                    @endif
-                                    @if($data->solution_ripening)
-                                    <div>
-                                        <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-md mb-1">Fase Pemasakan (>60 HST)</span>
-                                        <p class="text-sm leading-relaxed">{{ $data->solution_ripening }}</p>
-                                    </div>
-                                    @endif
-                                </div>
-                            </td>
-                            
-                            <td class="px-6 py-4 text-center align-top pt-5">
-                                <div class="flex justify-center space-x-2">
-                                    <button onclick="openEditModal(
-                                        '{{ $data->nutrient_deficiency_id }}', 
-                                        '{{ addslashes($data->name) }}', 
-                                        '{{ addslashes($data->solution) }}',
-                                        '{{ addslashes($data->solution_vegetative) }}',
-                                        '{{ addslashes($data->solution_generative) }}',
-                                        '{{ addslashes($data->solution_ripening) }}'
-                                    )" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors tooltip" title="Edit Data">
-                                        <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-gray-500">Belum ada data master. Silakan tambah data baru.</td>
-                        </tr>
-                    @endforelse
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($deficiencies as $index => $deficiency)
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-4 px-6 text-gray-600">{{ $index + 1 }}</td>
+                        <td class="py-4 px-6 font-bold text-red-500">{{ $deficiency->name }}</td>
+                        <td class="py-4 px-6 text-center">
+                            <button onclick="openModal('modal-{{ $deficiency->nutrient_deficiency_id }}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition font-semibold text-sm flex items-center justify-center w-full">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                Edit Data
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="editModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeEditModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    @foreach($deficiencies as $deficiency)
+    <div id="modal-{{ $deficiency->nutrient_deficiency_id }}" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-50 transition-opacity" onclick="closeModal('modal-{{ $deficiency->nutrient_deficiency_id }}')"></div>
             
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-gray-100">
-                <form id="editForm" method="POST">
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left shadow-2xl transform transition-all sm:my-8 sm:align-middle max-w-4xl w-full">
+                <form action="{{ route('admin.datamaster.update', $deficiency->nutrient_deficiency_id) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="bg-white px-6 pt-6 pb-6 sm:p-8 sm:pb-6">
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-xl leading-6 font-bold text-gray-900">Edit Data Master & Saran Penanganan</h3>
-                            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+                    <div class="px-8 py-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">Edit Saran Penanganan</h3>
+                            <button type="button" onclick="closeModal('modal-{{ $deficiency->nutrient_deficiency_id }}')" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kondisi / Penyakit <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" id="edit_name" required readonly 
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none shadow-sm text-sm" 
-                                title="Nama penyakit dikunci agar sinkron dengan AI">
-                            <p class="text-xs text-gray-400 mt-1"><i class="fa-solid fa-lock mr-1"></i> Nama tidak dapat diubah untuk menjaga sinkronisasi dengan AI.</p>
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Kondisi / Penyakit</label>
+                            <input type="text" value="{{ $deficiency->name }}" class="w-full border-gray-200 bg-gray-50 text-gray-500 rounded-lg text-sm cursor-not-allowed" disabled>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Saran Umum <span class="text-red-500">*</span></label>
-                                <textarea name="solution" id="edit_solution" rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm" placeholder="Saran umum jika umur HST tidak diketahui..."></textarea>
+                        <div class="border-b border-gray-200 mb-6">
+                            <nav class="-mb-px flex space-x-8">
+                                <button type="button" onclick="switchTab('unggul', {{ $deficiency->nutrient_deficiency_id }})" id="tab-btn-unggul-{{ $deficiency->nutrient_deficiency_id }}" class="tab-btn-{{ $deficiency->nutrient_deficiency_id }} border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-semibold text-sm transition">
+                                    Saran Bibit Unggul
+                                </button>
+                                <button type="button" onclick="switchTab('lokal', {{ $deficiency->nutrient_deficiency_id }})" id="tab-btn-lokal-{{ $deficiency->nutrient_deficiency_id }}" class="tab-btn-{{ $deficiency->nutrient_deficiency_id }} border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-semibold text-sm transition">
+                                    Saran Bibit Lokal
+                                </button>
+                            </nav>
+                        </div>
+
+                        <div id="tab-content-unggul-{{ $deficiency->nutrient_deficiency_id }}" class="tab-content-{{ $deficiency->nutrient_deficiency_id }}">
+                            <div class="mb-6">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Saran Umum (Wajib Diisi) <span class="text-red-500">*</span></label>
+                                <textarea name="saran_umum_unggul" rows="2" class="w-full border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" required placeholder="Saran penanganan jika petani tidak mengisi umur HST...">{{ $deficiency->saran_umum_unggul }}</textarea>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Fase Vegetatif (0-40 HST)</label>
-                                <textarea name="solution_vegetative" id="edit_vegetative" rows="4" class="w-full px-4 py-3 rounded-xl border border-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm" placeholder="Saran Penanganan untuk umur 0-40 hari..."></textarea>
+
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="block text-sm font-semibold text-gray-700">Saran Spesifik Berdasarkan Fase Umur (HST)</label>
+                                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md text-xs font-bold transition" onclick="addPhaseRow('unggul', {{ $deficiency->nutrient_deficiency_id }})">
+                                    + Tambah Fase Umur
+                                </button>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Fase Generatif (41-60 HST)</label>
-                                <textarea name="solution_generative" id="edit_generative" rows="4" class="w-full px-4 py-3 rounded-xl border border-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm text-sm" placeholder="Saran Penanganan untuk umur 41-60 hari..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Fase Pemasakan (>60 HST)</label>
-                                <textarea name="solution_ripening" id="edit_ripening" rows="4" class="w-full px-4 py-3 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm text-sm" placeholder="Saran Penanganan untuk umur di atas 60 hari..."></textarea>
+                            
+                            <div id="container-unggul-{{ $deficiency->nutrient_deficiency_id }}" class="space-y-3">
+                                @foreach($deficiency->solutions->where('seed_type', 'unggul') as $sol)
+                                <div class="relative bg-gray-50 border border-gray-200 p-4 rounded-lg mt-3">
+                                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded">X Hapus</button>
+                                    <div class="flex space-x-4 mb-2 w-3/4">
+                                        <div class="w-1/2">
+                                            <label class="block text-xs text-gray-500 mb-1">Umur Min (HST)</label>
+                                            <input type="number" name="unggul_solutions[existing_{{ $sol->id }}][min_hst]" value="{{ $sol->min_hst }}" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>
+                                        </div>
+                                        <div class="w-1/2">
+                                            <label class="block text-xs text-gray-500 mb-1">Umur Max (HST)</label>
+                                            <input type="number" name="unggul_solutions[existing_{{ $sol->id }}][max_hst]" value="{{ $sol->max_hst }}" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>
+                                        </div>
+                                    </div>
+                                    <textarea name="unggul_solutions[existing_{{ $sol->id }}][detail]" rows="2" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>{{ $sol->solution_detail }}</textarea>
+                                </div>
+                                @endforeach
                             </div>
                         </div>
+
+                        <div id="tab-content-lokal-{{ $deficiency->nutrient_deficiency_id }}" class="tab-content-{{ $deficiency->nutrient_deficiency_id }} hidden">
+                            <div class="mb-6">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Saran Umum (Wajib Diisi) <span class="text-red-500">*</span></label>
+                                <textarea name="saran_umum_lokal" rows="2" class="w-full border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" required placeholder="Saran penanganan jika petani tidak mengisi umur HST...">{{ $deficiency->saran_umum_lokal }}</textarea>
+                            </div>
+
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="block text-sm font-semibold text-gray-700">Saran Spesifik Berdasarkan Fase Umur (HST)</label>
+                                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md text-xs font-bold transition" onclick="addPhaseRow('lokal', {{ $deficiency->nutrient_deficiency_id }})">
+                                    + Tambah Fase Umur
+                                </button>
+                            </div>
+                            
+                            <div id="container-lokal-{{ $deficiency->nutrient_deficiency_id }}" class="space-y-3">
+                                @foreach($deficiency->solutions->where('seed_type', 'lokal') as $sol)
+                                <div class="relative bg-gray-50 border border-gray-200 p-4 rounded-lg mt-3">
+                                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded">X Hapus</button>
+                                    <div class="flex space-x-4 mb-2 w-3/4">
+                                        <div class="w-1/2">
+                                            <label class="block text-xs text-gray-500 mb-1">Umur Min (HST)</label>
+                                            <input type="number" name="lokal_solutions[existing_{{ $sol->id }}][min_hst]" value="{{ $sol->min_hst }}" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>
+                                        </div>
+                                        <div class="w-1/2">
+                                            <label class="block text-xs text-gray-500 mb-1">Umur Max (HST)</label>
+                                            <input type="number" name="lokal_solutions[existing_{{ $sol->id }}][max_hst]" value="{{ $sol->max_hst }}" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>
+                                        </div>
+                                    </div>
+                                    <textarea name="lokal_solutions[existing_{{ $sol->id }}][detail]" rows="2" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" required>{{ $sol->solution_detail }}</textarea>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-gray-100">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-blue-600 text-base font-medium text-white hover:bg-blue-800 transition-colors sm:ml-3 sm:w-auto sm:text-sm">Simpan Perubahan</button>
-                        <button type="button" onclick="closeEditModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto sm:text-sm">Batal</button>
+                    
+                    <div class="bg-gray-50 px-8 py-4 rounded-b-2xl flex justify-end space-x-3 border-t">
+                        <button type="button" onclick="closeModal('modal-{{ $deficiency->nutrient_deficiency_id }}')" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-2 px-6 rounded-lg transition">Batal</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    @endforeach
+
 @endsection
 
 @section('scripts')
 <script>
-    function openAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
-    function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
-
-    // MENERIMA 6 PARAMETER DATA SEKARANG
-    function openEditModal(id, name, solution, veg, gen, rip) {
-        document.getElementById('editForm').action = '/admin/datamaster/' + id;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('edit_solution').value = solution;
-        document.getElementById('edit_vegetative').value = veg;
-        document.getElementById('edit_generative').value = gen;
-        document.getElementById('edit_ripening').value = rip;
-        document.getElementById('editModal').classList.remove('hidden');
+    function openModal(modalID) {
+        document.getElementById(modalID).classList.remove('hidden');
     }
     
-    function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+    function closeModal(modalID) {
+        document.getElementById(modalID).classList.add('hidden');
+    }
+
+    function switchTab(type, id) {
+        let contents = document.querySelectorAll('.tab-content-' + id);
+        contents.forEach(el => el.classList.add('hidden'));
+
+        let buttons = document.querySelectorAll('.tab-btn-' + id);
+        buttons.forEach(el => {
+            el.classList.remove('border-blue-500', 'text-blue-600');
+            el.classList.add('border-transparent', 'text-gray-500');
+        });
+
+        document.getElementById('tab-content-' + type + '-' + id).classList.remove('hidden');
+        let activeBtn = document.getElementById('tab-btn-' + type + '-' + id);
+        activeBtn.classList.remove('border-transparent', 'text-gray-500');
+        activeBtn.classList.add('border-blue-500', 'text-blue-600');
+    }
+
+    function addPhaseRow(type, id) {
+        let container = document.getElementById('container-' + type + '-' + id);
+        let uniqueId = 'new_' + Date.now();
+        
+        let html = `
+        <div class="relative bg-gray-50 border border-gray-200 p-4 rounded-lg mt-3">
+            <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded transition">X Hapus</button>
+            <div class="flex space-x-4 mb-2 w-3/4">
+                <div class="w-1/2">
+                    <label class="block text-xs text-gray-500 mb-1">Umur Min (HST)</label>
+                    <input type="number" name="${type}_solutions[${uniqueId}][min_hst]" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" placeholder="0" required>
+                </div>
+                <div class="w-1/2">
+                    <label class="block text-xs text-gray-500 mb-1">Umur Max (HST)</label>
+                    <input type="number" name="${type}_solutions[${uniqueId}][max_hst]" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" placeholder="40" required>
+                </div>
+            </div>
+            <textarea name="${type}_solutions[${uniqueId}][detail]" rows="2" class="w-full border-gray-300 rounded text-sm focus:ring-blue-500" placeholder="Ketik saran..." required></textarea>
+        </div>`;
+        
+        container.insertAdjacentHTML('beforeend', html);
+    }
 </script>
 @endsection

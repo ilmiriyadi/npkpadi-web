@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NutrientDeficiencyController;
 use App\Http\Controllers\SyncController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,7 @@ Route::get('/dashboard', function () {
             
     // Rute CRUD Data Master
     Route::post('/datamaster', [DashboardController::class, 'adminDataMasterStore'])->name('datamaster.store');
-    Route::put('/datamaster/{id}', [DashboardController::class, 'adminDataMasterUpdate'])->name('datamaster.update');
+    Route::put('/datamaster/{id}', [NutrientDeficiencyController::class, 'update'])->name('datamaster.update');
     Route::delete('/datamaster/{id}', [DashboardController::class, 'adminDataMasterDestroy'])->name('datamaster.destroy');
 
     // Halaman Riwayat Admin

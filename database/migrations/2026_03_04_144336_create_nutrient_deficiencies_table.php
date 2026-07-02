@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('nutrient_deficiencies', function (Blueprint $table) {
             $table->id('nutrient_deficiency_id');
             $table->string('name', 100);
-            $table->text('solution');
+            $table->text('saran_umum_unggul')->nullable();
+            $table->text('saran_umum_lokal')->nullable();
             $table->timestamps();
         });
     }

@@ -48,6 +48,28 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Tanggal Tanam <span class="text-red-500">*</span></label>
                     <input type="date" name="planting_date" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#387F39] outline-none transition-all shadow-sm bg-gray-50 focus:bg-white text-sm">
                 </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Jenis Bibit Padi <span class="text-red-500">*</span>
+                    </label>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="relative flex items-center justify-center py-3 px-4 border rounded-xl cursor-pointer hover:bg-green-50 transition-all border-gray-200">
+                            <input type="radio" name="seed_type" value="unggul" class="hidden peer" required>
+                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">
+                                Bibit Unggul
+                            </span>
+                        </label>
+
+                        <label class="relative flex items-center justify-center py-3 px-4 border rounded-xl cursor-pointer hover:bg-green-50 transition-all border-gray-200">
+                            <input type="radio" name="seed_type" value="lokal" class="hidden peer" required>
+                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">
+                                Bibit Lokal
+                            </span>
+                        </label>
+                    </div>
+                </div>
                 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Alamat Deskriptif (Opsional)</label>
