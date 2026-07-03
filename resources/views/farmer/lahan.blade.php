@@ -37,7 +37,7 @@
                         </p>
                     </div>
                     <div class="flex space-x-2">
-                        <a href="#" onclick="event.preventDefault(); openEditModal({{ $land->land_id }}, '{{ addslashes($land->name) }}', '{{ addslashes($land->location) }}', '{{ $land->planting_date ? \Carbon\Carbon::parse($land->planting_date)->format('Y-m-d') : '' }}', '{{ $land->seed_type }}')" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
+                        <a href="{{ route('farmer.lahan.edit', $land->land_id) }}" class="text-gray-400 hover:text-blue-500 transition-colors tooltip" title="Edit Lahan">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
 
@@ -85,10 +85,6 @@
                         <p class="mt-1"><span class="font-medium text-gray-800">Jenis Bibit:</span> <br> {{ $land->seed_type == 'unggul' ? 'Bibit Unggul' : 'Bibit Lokal' }}</p>
                     </div>
                 </div>
-
-                <a href="{{ route('farmer.history') }}" class="block w-full text-center bg-green-50 hover:bg-[#C8E6C9] text-green-800 font-semibold py-3 rounded-xl transition-colors text-sm relative z-10">
-                    Lihat Data Deteksi <i class="fa-solid fa-arrow-right ml-2"></i>
-                </a>
             </div>
             @endforeach
         </div>
@@ -151,53 +147,6 @@
                         <button type="button" onclick="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto sm:text-sm">
                             Batal
                         </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Edit Lahan -->
-    <div id="editLahanModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeEditModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
-                
-                <form id="editLahanForm" method="POST">
-                    @csrf
-                    @method('PUT') <div class="bg-white px-6 pt-6 pb-6 sm:p-8 sm:pb-6">
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-xl leading-6 font-bold text-gray-900">Edit Data Lahan</h3>
-                            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label for="edit_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lahan <span class="text-red-500">*</span></label>
-                                <input type="text" name="name" id="edit_name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                            </div>
-                            <div>
-                                <label for="edit_location" class="block text-sm font-medium text-gray-700 mb-1">Detail Lokasi</label>
-                                <textarea name="location" id="edit_location" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm"></textarea>
-                            </div>
-                            <div>
-                                <label for="edit_planting_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tanam <span class="text-red-500">*</span></label>
-                                <input type="date" name="planting_date" id="edit_planting_date" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                            </div>
-                            <div>
-                                <label for="edit_seed_type" class="block text-sm font-medium text-gray-700 mb-1">Jenis Bibit <span class="text-red-500">*</span></label>
-                                <select name="seed_type" id="edit_seed_type" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
-                                    <option value="unggul">Unggul</option>
-                                    <option value="lokal">Lokal</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-gray-100">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 transition-colors sm:ml-3 sm:w-auto sm:text-sm">Simpan Perubahan</button>
-                        <button type="button" onclick="closeEditModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto sm:text-sm">Batal</button>
                     </div>
                 </form>
             </div>
