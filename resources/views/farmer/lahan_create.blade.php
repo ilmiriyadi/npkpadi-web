@@ -6,7 +6,6 @@
 @section('content')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    /* Tinggi peta disesuaikan agar proporsional dan tidak kebesaran */
     #map {
         height: 280px !important; 
         width: 100% !important;
@@ -15,11 +14,9 @@
         z-index: 10;
         position: relative;
     }
-    
     @media (min-width: 1024px) {
         #map { height: 350px !important; }
     }
-    
     .leaflet-container img {
         max-width: none !important;
         max-height: none !important;
@@ -27,7 +24,6 @@
 </style>
 
 <div class="max-w-5xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-    
     <div class="mb-6 pb-4 border-b border-gray-100">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800">Detail Lahan Sawah</h2>
         <p class="text-gray-500 text-sm mt-1">Lengkapi informasi di bawah ini.</p>
@@ -35,9 +31,7 @@
 
     <form action="{{ route('farmer.lahan.store') }}" method="POST">
         @csrf
-        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mb-6">
-            
             <div class="lg:col-span-5 space-y-4 md:space-y-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lahan <span class="text-red-500">*</span></label>
@@ -53,20 +47,14 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">
                         Jenis Bibit Padi <span class="text-red-500">*</span>
                     </label>
-                    
                     <div class="grid grid-cols-2 gap-4">
                         <label class="relative flex items-center justify-center py-3 px-4 border rounded-xl cursor-pointer hover:bg-green-50 transition-all border-gray-200">
                             <input type="radio" name="seed_type" value="unggul" class="hidden peer" required>
-                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">
-                                Bibit Unggul
-                            </span>
+                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">Bibit Unggul</span>
                         </label>
-
                         <label class="relative flex items-center justify-center py-3 px-4 border rounded-xl cursor-pointer hover:bg-green-50 transition-all border-gray-200">
                             <input type="radio" name="seed_type" value="lokal" class="hidden peer" required>
-                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">
-                                Bibit Lokal
-                            </span>
+                            <span class="text-sm font-semibold text-gray-600 peer-checked:text-[#387F39] peer-checked:font-bold">Bibit Lokal</span>
                         </label>
                     </div>
                 </div>
@@ -78,9 +66,14 @@
             </div>
 
             <div class="lg:col-span-7 flex flex-col">
-                <div class="mb-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
-                    <p class="text-xs text-gray-500 leading-relaxed">Geser peta dan klik lokasi persis sawah Anda. <br><span class="text-[#387F39] font-medium bg-green-50 px-1 py-0.5 rounded">Biarkan kosong jika Anda kesulitan menemukan titik lokasinya.</span></p>
+                <div class="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
+                        <p class="text-xs text-gray-500 leading-relaxed">Geser peta atau gunakan fitur GPS dari perangkat Anda.</p>
+                    </div>
+                    <button type="button" id="btn-gps" class="w-full sm:w-auto bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-location-crosshairs mr-1.5"></i> Gunakan GPS HP
+                    </button>
                 </div>
                 
                 <div id="map" class="flex-grow shadow-inner"></div>
@@ -99,15 +92,10 @@
         </div>
 
         <div class="flex flex-col-reverse sm:flex-row justify-end border-t border-gray-100 pt-5 mt-2 gap-3">
-            
-            <a href="{{ route('farmer.lahan') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center text-center">
-                Batal
-            </a>
-            
+            <a href="{{ route('farmer.lahan') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center text-center">Batal</a>
             <button type="submit" class="w-full sm:w-auto bg-[#387F39] hover:bg-green-800 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm hover:shadow-md flex items-center justify-center">
                 <i class="fa-solid fa-save mr-2"></i> Simpan Data
             </button>
-            
         </div>
     </form>
 </div>
@@ -115,23 +103,19 @@
 
 @section('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const defaultLat = -3.1145; 
         const defaultLng = 114.6030;
-        
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
         let marker = null;
 
-        // UPGRADE 1: Menggunakan Peta Satelit (Google Hybrid)
         L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             maxZoom: 20,
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
             attribution: '© Google Maps'
         }).addTo(map);
 
-        // UPGRADE 2: Membuat Pin Marker Warna Hijau
         const greenIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -144,21 +128,64 @@
         map.on('click', function(e) {
             const clickedLat = e.latlng.lat.toFixed(8);
             const clickedLng = e.latlng.lng.toFixed(8);
-
             document.getElementById('lat').value = clickedLat;
             document.getElementById('lng').value = clickedLng;
-
             if (marker) {
                 marker.setLatLng(e.latlng);
             } else {
-                // Memasang Pin Hijau saat di-klik
                 marker = L.marker(e.latlng, {icon: greenIcon}).addTo(map);
             }
         });
         
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 500);
+        document.getElementById('btn-gps').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Mencari lokasi...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude.toFixed(8);
+                    const lng = position.coords.longitude.toFixed(8);
+                    
+                    document.getElementById('lat').value = lat;
+                    document.getElementById('lng').value = lng;
+                    
+                    const newLatLng = new L.LatLng(lat, lng);
+                    map.setView(newLatLng, 18);
+                    
+                    if (marker) {
+                        marker.setLatLng(newLatLng);
+                    } else {
+                        marker = L.marker(newLatLng, {icon: greenIcon}).addTo(map);
+                    }
+
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i> Lokasi Ditemukan';
+                    btn.classList.replace('text-blue-600', 'text-green-600');
+                    btn.classList.replace('bg-blue-50', 'bg-green-50');
+                    btn.classList.replace('border-blue-200', 'border-green-200');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('text-green-600', 'text-blue-600');
+                        btn.classList.replace('bg-green-50', 'bg-blue-50');
+                        btn.classList.replace('border-green-200', 'border-blue-200');
+                        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    }, 3000);
+
+                }, function(error) {
+                    alert("Gagal mengambil lokasi GPS. Pastikan izin akses lokasi (Location/GPS) diaktifkan.");
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, { enableHighAccuracy: true });
+            } else {
+                alert("Browser tidak mendukung fitur lokasi GPS.");
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        });
+
+        setTimeout(() => { map.invalidateSize(); }, 500);
     });
 </script>
 @endsection

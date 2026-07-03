@@ -37,17 +37,6 @@
         @csrf
         @method('PUT')
         
-        <style>
-            .peer:checked ~ span {
-                color: #387F39;
-                font-weight: 700;
-            }
-            label:has(input.peer:checked) {
-                border-color: #387F39;
-                background-color: #f0fdf4; /* green-50 */
-            }
-        </style>
-        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mb-6">
             
             <div class="lg:col-span-5 space-y-4 md:space-y-5">
@@ -92,9 +81,14 @@
             </div>
 
             <div class="lg:col-span-7 flex flex-col">
-                <div class="mb-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
-                    <p class="text-xs text-gray-500 leading-relaxed">Geser peta dan klik lokasi baru jika ingin mengubah letak sawah. <br><span class="text-blue-600 font-medium">Boleh dibiarkan jika tidak ingin mengatur koordinat.</span></p>
+                <div class="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Titik Koordinat Peta (Opsional)</label>
+                        <p class="text-xs text-gray-500 leading-relaxed">Geser peta atau klik tombol GPS.</p>
+                    </div>
+                    <button type="button" id="btn-gps" class="w-full sm:w-auto bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-location-crosshairs mr-1.5"></i> Gunakan GPS HP
+                    </button>
                 </div>
                 
                 <div id="map" class="flex-grow shadow-inner"></div>
@@ -148,14 +142,14 @@
         const map = L.map('map').setView([startLat, startLng], startZoom);
         let marker = null;
 
-        // UPGRADE 1: Menggunakan Peta Satelit (Google Hybrid)
+        // Menggunakan Peta Satelit (Google Hybrid)
         L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             maxZoom: 20,
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
             attribution: '© Google Maps'
         }).addTo(map);
 
-        // UPGRADE 2: Membuat Pin Marker Warna Hijau
+        // Pin Marker Warna Hijau
         const greenIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -185,10 +179,63 @@
             }
         });
         
+        // ==========================================
+        // FITUR AMBIL LOKASI GPS (GEOLOCATION API)
+        // ==========================================
+        document.getElementById('btn-gps').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Ubah tombol jadi loading
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Mencari lokasi...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude.toFixed(8);
+                    const lng = position.coords.longitude.toFixed(8);
+                    
+                    document.getElementById('lat').value = lat;
+                    document.getElementById('lng').value = lng;
+                    
+                    const newLatLng = new L.LatLng(lat, lng);
+                    map.setView(newLatLng, 18); // Zoom dekat ke lokasi
+                    
+                    if (marker) {
+                        marker.setLatLng(newLatLng);
+                    } else {
+                        marker = L.marker(newLatLng, {icon: greenIcon}).addTo(map);
+                    }
+
+                    // Kembalikan tombol sukses
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i> Lokasi Ditemukan';
+                    btn.classList.replace('text-blue-600', 'text-green-600');
+                    btn.classList.replace('bg-blue-50', 'bg-green-50');
+                    btn.classList.replace('border-blue-200', 'border-green-200');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('text-green-600', 'text-blue-600');
+                        btn.classList.replace('bg-green-50', 'bg-blue-50');
+                        btn.classList.replace('border-green-200', 'border-blue-200');
+                        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    }, 3000);
+
+                }, function(error) {
+                    alert("Gagal mengambil lokasi GPS. Pastikan izin akses lokasi (Location/GPS) diaktifkan di pengaturan HP atau browser Anda.");
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, { enableHighAccuracy: true });
+            } else {
+                alert("Browser atau perangkat Anda tidak mendukung fitur lokasi GPS.");
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        });
+
         setTimeout(() => {
             map.invalidateSize();
         }, 500);
     });
 </script>
-
 @endsection
