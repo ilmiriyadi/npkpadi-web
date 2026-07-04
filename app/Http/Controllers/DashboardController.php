@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Land;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -143,7 +144,6 @@ class DashboardController extends Controller
     public function adminUsers()
     {
         // Ambil semua user yang mendaftar sebagai 'farmer' (Petani)
-        // Ambil semua user yang mendaftar sebagai 'farmer' (Petani)
         $farmers = \App\Models\User::where('role', 'farmer')
                     ->withCount(['lands', 'detections'])
                     ->orderBy('created_at', 'desc')
@@ -233,29 +233,71 @@ class DashboardController extends Controller
     // Halaman Riwayat Deteksi Keseluruhan (Admin)
     public function adminHistory(Request $request)
     {
-        // Ambil semua deteksi beserta relasi ke tabel lahan, user (petani), dan penyakit
         $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency']);
 
-        // Logika Pencarian (Bisa cari nama petani, lahan, atau penyakit)
+        // 1. Filter Pencarian Teks (Petani & Lahan)
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->whereHas('land.user', function($qUser) use ($search) {
-                    $qUser->where('name', 'like', '%' . $search . '%');
-                })
-                ->orWhereHas('land', function($qLand) use ($search) {
-                    $qLand->where('name', 'like', '%' . $search . '%');
-                })
-                ->orWhereHas('nutrientDeficiency', function($qNutrient) use ($search) {
-                    $qNutrient->where('name', 'like', '%' . $search . '%');
-                });
+            $query->whereHas('land', function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%');
+                  });
             });
         }
 
-        // Eksekusi data, urutkan dari yang paling baru
+        // 2. Filter Jenis Bibit
+        if ($request->filled('seed_type')) {
+            $query->whereHas('land', function($q) use ($request) {
+                $q->where('seed_type', $request->seed_type);
+            });
+        }
+
+        // 3. Filter Jenis Defisiensi
+        if ($request->filled('deficiency')) {
+            $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
         $detections = $query->orderBy('created_at', 'desc')->get();
 
-        return view('admin.history', compact('detections'));
+        $lands = \App\Models\Land::all();
+
+        return view('admin.history', compact('detections', 'lands'));
+    }
+
+    // PDF Halaman Riwayat Admin
+    public function adminHistoryPdf(Request $request)
+    {
+        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency']);
+
+        // 1. Filter Pencarian Teks (Petani & Lahan)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('land', function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        // 2. Filter Jenis Bibit
+        if ($request->filled('seed_type')) {
+            $query->whereHas('land', function($q) use ($request) {
+                $q->where('seed_type', $request->seed_type);
+            });
+        }
+
+        // 3. Filter Jenis Defisiensi
+        if ($request->filled('deficiency')) {
+            $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
+        $detections = $query->latest()->get();
+
+        $pdf = Pdf::loadView('pdf.history', compact('detections'))->setPaper('A4', 'landscape');
+        
+        return $pdf->download('Laporan_Aktivitas_Admin.pdf');
     }
 
 
@@ -381,7 +423,6 @@ class DashboardController extends Controller
     // Memproses perubahan data (Edit Lahan)
     public function farmerLahanUpdate(Request $request, $id)
     {
-        // 1. Tambahkan latitude & longitude di validasi
         $request->validate([
             'name' => 'required|string|max:100',
             'location' => 'nullable|string|max:255',
@@ -394,7 +435,6 @@ class DashboardController extends Controller
         // Cari lahan berdasarkan ID dan pastikan itu milik petani yang sedang login
         $land = \App\Models\Land::where('land_id', $id)->where('user_id', Auth::id())->firstOrFail();
         
-        // 2. Tambahkan latitude & longitude di proses update database
         $land->update([
             'name' => $request->name,
             'location' => $request->location,
@@ -419,39 +459,85 @@ class DashboardController extends Controller
     // Halaman Riwayat Deteksi (Petani)
     public function farmerHistory(Request $request)
     {
-        // 1. Ambil daftar Lahan milik petani ini untuk mengisi dropdown Filter
         $lands = \App\Models\Land::where('user_id', Auth::id())->get();
 
-        // 2. Mulai susun query dasar untuk mengambil Riwayat Deteksi
         $query = \App\Models\Detection::with(['land', 'nutrientDeficiency'])
             ->whereHas('land', function($q) {
-                $q->where('user_id', Auth::id());
+                $q->where('user_id', auth()->id());
             });
 
-        // 3. Logika Pencarian (Search) berdasarkan nama lahan atau hasil AI
+        // 1. Filter Pencarian Teks
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                // Cari dari nama lahan
                 $q->whereHas('land', function($qLand) use ($search) {
                     $qLand->where('name', 'like', '%' . $search . '%');
-                })
-                // Atau cari dari nama penyakit (Misal: ketik "Nitrogen")
-                ->orWhereHas('nutrientDeficiency', function($qNutrient) use ($search) {
-                    $qNutrient->where('name', 'like', '%' . $search . '%');
                 });
             });
         }
 
-        // 4. Logika Filter (Dropdown Lahan)
+        // 2. Filter Lahan Spesifik
         if ($request->filled('land_id')) {
             $query->where('land_id', $request->land_id);
         }
 
-        // 5. Eksekusi query dan urutkan dari yang terbaru
+        // 3. Filter Jenis Bibit
+        if ($request->filled('seed_type')) {
+            $query->whereHas('land', function($q) use ($request) {
+                $q->where('seed_type', $request->seed_type);
+            });
+        }
+
+        // 4. Filter Jenis Defisiensi (Hasil Klasifikasi)
+        if ($request->filled('deficiency')) {
+            $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
         $detections = $query->orderBy('created_at', 'desc')->get();
 
-        // Kirim variabel $detections dan $lands ke tampilan HTML
         return view('farmer.history', compact('detections', 'lands'));
+    }
+
+    // PDF Halaman Riwayat Petani
+    public function farmerHistoryPdf(Request $request)
+    {
+        $query = \App\Models\Detection::with(['land', 'nutrientDeficiency'])
+            ->whereHas('land', function($q) {
+                $q->where('user_id', auth()->id());
+            });
+
+        // 1. Filter Pencarian Teks
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('land', function($qLand) use ($search) {
+                    $qLand->where('name', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        // 2. Filter Lahan Spesifik
+        if ($request->filled('land_id')) {
+            $query->where('land_id', $request->land_id);
+        }
+
+        // 3. Filter Jenis Bibit
+        if ($request->filled('seed_type')) {
+            $query->whereHas('land', function($q) use ($request) {
+                $q->where('seed_type', $request->seed_type);
+            });
+        }
+
+        // 4. Filter Jenis Defisiensi
+        if ($request->filled('deficiency')) {
+            $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
+        $detections = $query->latest()->get();
+
+        $pdf = Pdf::loadView('pdf.history', compact('detections'));
+        $pdf->setPaper('A4', 'landscape'); 
+        
+        return $pdf->download('Riwayat_Deteksi_Petani.pdf');
     }
 }

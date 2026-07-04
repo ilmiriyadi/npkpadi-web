@@ -4,33 +4,59 @@
 @section('header_title', 'Riwayat Deteksi Nutrisi')
 
 @section('content')
-    <form action="{{ route('farmer.history') }}" method="GET" class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
-        <div class="relative w-full md:w-96">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama lahan atau hasil deteksi..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-sm">
+    <!-- AREA FILTER PENCARIAN -->
+    <div class="bg-white p-4 md:p-5 rounded-3xl shadow-sm border border-gray-100 mb-6">
+        <!-- Pesan Tips Cetak PDF -->
+        <div class="mb-4 flex items-start sm:items-center p-3 text-sm text-blue-800 rounded-xl bg-blue-50 border border-blue-100">
+            <i class="fa-solid fa-circle-info mt-0.5 sm:mt-0 mr-2.5 text-blue-600 text-lg"></i>
+            <span><strong>Tips:</strong> Hasil cetak PDF akan secara otomatis menyesuaikan dengan filter pencarian yang sedang Anda aktifkan di bawah ini.</span>
         </div>
-        
-        <div class="flex space-x-3 w-full md:w-auto">
-            <select name="land_id" class="border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
-                <option value="">Semua Lahan</option>
-                @foreach($lands as $land)
-                    <option value="{{ $land->land_id }}" {{ request('land_id') == $land->land_id ? 'selected' : '' }}>
-                        {{ $land->name }}
-                    </option>
-                @endforeach
-            </select>
-            
-            <button type="submit" class="bg-[#387F39] hover:bg-green-800 text-white border border-transparent px-5 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center tooltip" title="Terapkan Filter">
-                <i class="fa-solid fa-filter md:mr-2"></i> <span class="hidden md:inline">Cari</span>
-            </button>
 
-            @if(request('search') || request('land_id'))
-                <a href="{{ route('farmer.history') }}" class="bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 px-4 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center tooltip" title="Hapus Filter">
-                    <i class="fa-solid fa-rotate-right"></i>
+        <form action="{{ route('farmer.history') }}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                
+                <!-- Filter Lahan -->
+                <select name="land_id" class="w-full border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
+                    <option value="">Semua Lahan</option>
+                    @foreach($lands as $land)
+                        <option value="{{ $land->land_id }}" {{ request('land_id') == $land->land_id ? 'selected' : '' }}>{{ $land->name }}</option>
+                    @endforeach
+                </select>
+
+                <!-- Filter Bibit -->
+                <select name="seed_type" class="w-full border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
+                    <option value="">Semua Bibit</option>
+                    <option value="unggul" {{ request('seed_type') == 'unggul' ? 'selected' : '' }}>Bibit Unggul</option>
+                    <option value="lokal" {{ request('seed_type') == 'lokal' ? 'selected' : '' }}>Bibit Lokal</option>
+                </select>
+
+                <!-- Filter Hasil -->
+                <select name="deficiency" class="w-full border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
+                    <option value="">Semua Hasil Defisiensi</option>
+                    <option value="1" {{ request('deficiency') == '1' ? 'selected' : '' }}>Kekurangan Nitrogen</option>
+                    <option value="2" {{ request('deficiency') == '2' ? 'selected' : '' }}>Kekurangan Fosfor</option>
+                    <option value="3" {{ request('deficiency') == '3' ? 'selected' : '' }}>Kekurangan Kalium</option>
+                </select>
+
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+                <!-- Tombol Reset Filter Diperbaiki -->
+                @if(request('land_id') || request('seed_type') || request('deficiency'))
+                    <a href="{{ route('farmer.history') }}" class="bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center tooltip" title="Hapus Semua Filter">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </a>
+                @endif
+                
+                <button type="submit" class="bg-[#387F39] hover:bg-green-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center">
+                    <i class="fa-solid fa-filter mr-2"></i> Terapkan Filter
+                </button>
+                <a href="{{ route('farmer.history.pdf', request()->query()) }}" target="_blank" class="bg-red-500 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center tooltip" title="Unduh PDF dari filter ini">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Cetak PDF
                 </a>
-            @endif
-        </div>
-    </form>
+            </div>
+        </form>
+    </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto custom-scrollbar">
@@ -47,53 +73,36 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-gray-100">
-                    
                     @forelse($detections as $index => $detection)
                     @php
-                        // Hitung HST (Hari Setelah Tanam)
                         $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
                         $hst = intval($rawDays);
                         $seedType = $detection->land->seed_type ?? 'unggul';
-
-                        // Tentukan batas maksimal panen berdasarkan bibit (Unggul: 110, Lokal: 270)
                         $batasPanen = ($seedType == 'unggul') ? 110 : 270;
 
-                        // CEK HUMAN ERROR: Jika umur melebihi batas panen
                         if ($hst > $batasPanen) {
-                            $teksSolusi = "PERINGATAN!! Umur padi di lahan ini tercatat " . $hst . " Hari Setelah Tanam (HST). Angka ini melebihi masa panen normal (" . $batasPanen . " hari untuk Bibit " . ucfirst($seedType) . ").\n\nSistem mendeteksi Anda mungkin belum memperbarui 'Tanggal Tanam' untuk musim tanam yang baru. Silakan edit Tanggal Tanam di menu 'Kelola Lahan' agar saran penanganan kembali akurat.";
+                            $teksSolusi = "PERINGATAN!!! Umur padi di lahan ini tercatat " . $hst . " Hari Setelah Tanam (HST). Angka ini melebihi masa panen normal (" . $batasPanen . " hari untuk Bibit " . ucfirst($seedType) . ").\n\nSistem mendeteksi Anda mungkin belum memperbarui 'Tanggal Tanam' untuk musim tanam yang baru. Silakan edit Tanggal Tanam di menu 'Kelola Lahan' agar saran penanganan kembali akurat.";
                         } else {
-                            // JIKA NORMAL: Cari solusi yang cocok di tabel solutions secara dinamis
-                            $solusi = $detection->nutrientDeficiency->solutions()
-                                ->where('seed_type', $seedType)
-                                ->where('min_hst', '<=', $hst)
-                                ->where('max_hst', '>=', $hst)
-                                ->first();
-
-                            // Jika ketemu saran spesifik fase, gunakan itu. Jika belum diatur admin, gunakan saran umum.
+                            $solusi = $detection->nutrientDeficiency->solutions()->where('seed_type', $seedType)->where('min_hst', '<=', $hst)->where('max_hst', '>=', $hst)->first();
                             if ($solusi) {
                                 $teksSolusi = "[Fase " . $solusi->min_hst . "-" . $solusi->max_hst . " HST] - " . $solusi->solution_detail;
                             } else {
                                 $teksSolusi = "[Saran Umum] - " . (($seedType == 'unggul') ? $detection->nutrientDeficiency->saran_umum_unggul : $detection->nutrientDeficiency->saran_umum_lokal);
                             }
                         }
-                        
-                        // FIX: Mengamankan teks dari karakter enter (\n) dan tanda kutip agar tidak merusak tombol onClick JS
                         $teksSolusiAman = str_replace(["\r", "\n"], ["", "\\n"], addslashes($teksSolusi));
                     @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
-                            
                              <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ $teksSolusiAman }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
                                     <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                                 </div>
                             </td>
-                            
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-gray-800">{{ $detection->created_at->format('d M Y') }}</div>
                                 <div class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</div>
                             </td>
-                            
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-700">
                                     @if($detection->land->latitude && $detection->land->longitude)
@@ -105,39 +114,25 @@
                                     @endif
                                 </div>
                                 <div class="mt-2">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider 
-                                        {{ $detection->land->seed_type == 'unggul' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700' }}">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider {{ $detection->land->seed_type == 'unggul' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700' }}">
                                         {{ $detection->land->seed_type == 'unggul' ? 'Bibit Unggul' : 'Bibit Lokal' }}
                                     </span>
                                 </div>
                             </td>
-                            
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="text-sm font-bold text-gray-800">{{ $hst }} Hari</span>
                                 <div class="text-xs text-gray-500 mt-0.5">Setelah Tanam (HST)</div>
                             </td>
-
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($detection->nutrient_deficiency_id == 1) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                                        <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
-                                    </span>
-                                @elseif($detection->nutrient_deficiency_id == 2) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
-                                    </span>
-                                @elseif($detection->nutrient_deficiency_id == 3) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
-                                        <div class="w-2 h-2 rounded-full bg-orange-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
-                                    </span>
-                                @else <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
-                                        <div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}
-                                    </span>
+                                @if($detection->nutrient_deficiency_id == 1) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}</span>
+                                @elseif($detection->nutrient_deficiency_id == 2) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><div class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}</span>
+                                @elseif($detection->nutrient_deficiency_id == 3) <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700"><div class="w-2 h-2 rounded-full bg-orange-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}</span>
+                                @else <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700"><div class="w-2 h-2 rounded-full bg-red-500 mr-2"></div> {{ $detection->nutrientDeficiency->name }}</span>
                                 @endif
                                 <div class="text-xs text-gray-500 mt-1.5 font-medium">Confidence Score: <span class="text-blue-600">{{ round($detection->confidence_score, 2) }}%</span></div>
                             </td>
-                            
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <button type="button" 
-                                    onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ $teksSolusiAman }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" 
-                                    class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Saran Penanganan">
+                                <button type="button" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ $teksSolusiAman }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')" class="text-[#387F39] hover:text-green-800 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors tooltip" title="Lihat Saran Penanganan">
                                     Saran
                                 </button>
                             </td>
@@ -150,22 +145,20 @@
                                         <i class="fa-solid fa-camera-retro text-2xl text-gray-400"></i>
                                     </div>
                                     <p class="text-base font-bold text-gray-700">Belum ada riwayat deteksi</p>
-                                    <p class="text-sm text-gray-500 mt-1">Alat Raspberry Pi Anda belum mengirimkan data deteksi apapun ke sistem.</p>
+                                    <p class="text-sm text-gray-500 mt-1">Sistem belum menemukan data sesuai pencarian ini.</p>
                                 </div>
                             </td>
                         </tr>
                     @endforelse
-
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="detailModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
             
             <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-gray-100">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -199,7 +192,6 @@
                                 <i class="fa-solid fa-prescription-bottle-medical text-green-600 mr-2 text-lg"></i>
                                 <h4 class="font-bold text-green-800">Saran Penanganan:</h4>
                             </div>
-                            <!-- Tambahan whitespace-pre-wrap di sini membuat enter (\n) tampil rapi ke bawah -->
                             <p id="modal_solution" class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"></p>
                         </div>
                     </div>
@@ -236,7 +228,6 @@
             tabs.classList.add('hidden');
             switchModalTab('original');
         }
-        
         document.getElementById('detailModal').classList.remove('hidden');
     }
 

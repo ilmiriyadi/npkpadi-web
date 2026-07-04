@@ -47,6 +47,7 @@ Route::get('/dashboard', function () {
     Route::post('/users', [DashboardController::class, 'adminUsersStore'])->name('users.store');
     Route::put('/users/{id}', [DashboardController::class, 'adminUsersUpdate'])->name('users.update');
     Route::delete('/users/{id}', [DashboardController::class, 'adminUsersDestroy'])->name('users.destroy');    
+    Route::get('/history/pdf', [DashboardController::class, 'adminHistoryPdf'])->name('history.pdf');
 
 });
 
@@ -79,6 +80,7 @@ Route::get('/dashboard', function () {
     // Halaman Pengaturan Profil Petani
     Route::get('/settings', [DashboardController::class, 'farmerSettings'])->name('settings');
     Route::put('/settings', [DashboardController::class, 'farmerSettingsUpdate'])->name('settings.update');
+    Route::get('/history/pdf', [DashboardController::class, 'farmerHistoryPdf'])->name('history.pdf');
 
 });
 
