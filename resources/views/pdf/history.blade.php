@@ -37,27 +37,36 @@
         <tbody>
             @forelse($detections as $index => $detection)
                 @php
-                    $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
-                    $hst = intval($rawDays);
-                    $seedType = $detection->land->seed_type ?? 'unggul';
+                    $land = $detection->land;
+                    $deficiency = $detection->nutrientDeficiency;
+                    $seedType = $land->seed_type ?? 'unggul';
                     $batasPanen = ($seedType == 'unggul') ? 110 : 270;
 
-                    if ($hst > $batasPanen) {
-                        $teksSolusi = "PERINGATAN: Umur padi melebihi batas panen (" . $batasPanen . " HST). Harap perbarui tanggal tanam.";
+                    if (!$land || !$land->planting_date || !$deficiency) {
+                        $hst = '-';
+                        $teksSolusi = 'Data lahan atau hasil deteksi tidak lengkap.';
                         $isError = true;
                     } else {
-                        $isError = false;
-                        $solusi = $detection->nutrientDeficiency->solutions()
-                            ->where('seed_type', $seedType)->where('min_hst', '<=', $hst)->where('max_hst', '>=', $hst)->first();
-                        $teksSolusi = $solusi ? "[Fase {$solusi->min_hst}-{$solusi->max_hst} HST]\n" . $solusi->solution_detail : "Saran Umum:\n" . (($seedType == 'unggul') ? $detection->nutrientDeficiency->saran_umum_unggul : $detection->nutrientDeficiency->saran_umum_lokal);
+                        $rawDays = \Carbon\Carbon::parse($land->planting_date)->diffInDays($detection->created_at);
+                        $hst = intval($rawDays);
+
+                        if ($hst > $batasPanen) {
+                            $teksSolusi = "PERINGATAN: Umur padi melebihi batas panen (" . $batasPanen . " HST). Harap perbarui tanggal tanam.";
+                            $isError = true;
+                        } else {
+                            $isError = false;
+                            $solusi = $deficiency->solutions
+                                ->first(fn ($solution) => $solution->seed_type == $seedType && $solution->min_hst <= $hst && $solution->max_hst >= $hst);
+                            $teksSolusi = $solusi ? "[Fase {$solusi->min_hst}-{$solusi->max_hst} HST]\n" . $solusi->solution_detail : "Saran Umum:\n" . (($seedType == 'unggul') ? $deficiency->saran_umum_unggul : $deficiency->saran_umum_lokal);
+                        }
                     }
                 @endphp
                 <tr>
                     <td style="text-align: center;">{{ $index + 1 }}</td>
                     <td>
-                        <strong>{{ $detection->land->name }}</strong><br>
-                        @if($detection->land->user)
-                            Pemilik: {{ $detection->land->user->name }}<br>
+                        <strong>{{ $land->name ?? 'Lahan tidak tersedia' }}</strong><br>
+                        @if($land?->user)
+                            Pemilik: {{ $land->user->name }}<br>
                         @endif
                         <span class="badge {{ $seedType == 'unggul' ? 'bg-unggul' : 'bg-lokal' }}" style="margin-top: 5px;">
                             {{ ucfirst($seedType) }}
@@ -65,7 +74,7 @@
                     </td>
                     <td>{{ $detection->created_at->format('d M Y') }}<br>{{ $detection->created_at->timezone('Asia/Makassar')->format('H:i') }} WITA</td>
                     <td class="{{ $isError ? 'text-danger' : '' }}">{{ $hst }} HST</td>
-                    <td><strong>{{ $detection->nutrientDeficiency->name }}</strong><br>Akurasi: {{ round($detection->confidence_score, 1) }}%</td>
+                    <td><strong>{{ $deficiency->name ?? 'Tidak tersedia' }}</strong><br>Akurasi: {{ round($detection->confidence_score, 1) }}%</td>
                     <td style="white-space: pre-wrap;">{{ $teksSolusi }}</td>
                 </tr>
             @empty

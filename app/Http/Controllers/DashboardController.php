@@ -268,7 +268,7 @@ class DashboardController extends Controller
     // PDF Halaman Riwayat Admin
     public function adminHistoryPdf(Request $request)
     {
-        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency']);
+        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency.solutions']);
 
         // 1. Filter Pencarian Teks (Petani & Lahan)
         if ($request->filled('search')) {
@@ -501,7 +501,7 @@ class DashboardController extends Controller
     // PDF Halaman Riwayat Petani
     public function farmerHistoryPdf(Request $request)
     {
-        $query = \App\Models\Detection::with(['land', 'nutrientDeficiency'])
+        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency.solutions'])
             ->whereHas('land', function($q) {
                 $q->where('user_id', auth()->id());
             });
