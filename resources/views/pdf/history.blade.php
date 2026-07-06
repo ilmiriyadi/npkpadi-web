@@ -21,6 +21,9 @@
     <div class="header">
         <h2>Laporan Riwayat Deteksi Nutrisi Padi (NPK)</h2>
         <p>Dicetak pada: {{ \Carbon\Carbon::now()->timezone('Asia/Makassar')->format('d M Y, H:i') }} WITA</p>
+        @if(isset($totalDetections, $pdfLimit) && $totalDetections > $detections->count())
+            <p>Menampilkan {{ $detections->count() }} data terbaru dari {{ $totalDetections }} data. Gunakan filter untuk laporan lebih spesifik.</p>
+        @endif
     </div>
 
     <table>

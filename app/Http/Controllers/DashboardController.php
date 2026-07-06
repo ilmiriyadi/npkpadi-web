@@ -11,6 +11,8 @@ use Throwable;
 
 class DashboardController extends Controller
 {
+    private const PDF_HISTORY_LIMIT = 50;
+
     // ==========================================
     // AREA ADMIN
     // ==========================================
@@ -295,9 +297,10 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
-        $detections = $query->latest()->get();
+        $totalDetections = (clone $query)->count();
+        $detections = $query->latest()->limit(self::PDF_HISTORY_LIMIT)->get();
 
-        return $this->downloadHistoryPdf($detections, 'Laporan_Aktivitas_Admin.pdf');
+        return $this->downloadHistoryPdf($detections, 'Laporan_Aktivitas_Admin.pdf', $totalDetections);
     }
 
 
@@ -533,15 +536,18 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
-        $detections = $query->latest()->get();
+        $totalDetections = (clone $query)->count();
+        $detections = $query->latest()->limit(self::PDF_HISTORY_LIMIT)->get();
 
-        return $this->downloadHistoryPdf($detections, 'Riwayat_Deteksi_Petani.pdf');
+        return $this->downloadHistoryPdf($detections, 'Riwayat_Deteksi_Petani.pdf', $totalDetections);
     }
 
-    private function downloadHistoryPdf($detections, string $filename)
+    private function downloadHistoryPdf($detections, string $filename, int $totalDetections)
     {
+        $pdfLimit = self::PDF_HISTORY_LIMIT;
+
         try {
-            return Pdf::loadView('pdf.history', compact('detections'))
+            return Pdf::loadView('pdf.history', compact('detections', 'totalDetections', 'pdfLimit'))
                 ->setPaper('A4', 'landscape')
                 ->download($filename);
         } catch (Throwable $e) {
@@ -552,7 +558,7 @@ class DashboardController extends Controller
             ]);
 
             return response()
-                ->view('pdf.history', compact('detections'))
+                ->view('pdf.history', compact('detections', 'totalDetections', 'pdfLimit'))
                 ->header('Content-Type', 'text/html; charset=UTF-8');
         }
     }
