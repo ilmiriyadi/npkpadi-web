@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Land;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Throwable;
 
 class DashboardController extends Controller
 {
@@ -295,9 +297,7 @@ class DashboardController extends Controller
 
         $detections = $query->latest()->get();
 
-        $pdf = Pdf::loadView('pdf.history', compact('detections'))->setPaper('A4', 'landscape');
-        
-        return $pdf->download('Laporan_Aktivitas_Admin.pdf');
+        return $this->downloadHistoryPdf($detections, 'Laporan_Aktivitas_Admin.pdf');
     }
 
 
@@ -535,9 +535,25 @@ class DashboardController extends Controller
 
         $detections = $query->latest()->get();
 
-        $pdf = Pdf::loadView('pdf.history', compact('detections'));
-        $pdf->setPaper('A4', 'landscape'); 
-        
-        return $pdf->download('Riwayat_Deteksi_Petani.pdf');
+        return $this->downloadHistoryPdf($detections, 'Riwayat_Deteksi_Petani.pdf');
+    }
+
+    private function downloadHistoryPdf($detections, string $filename)
+    {
+        try {
+            return Pdf::loadView('pdf.history', compact('detections'))
+                ->setPaper('A4', 'landscape')
+                ->download($filename);
+        } catch (Throwable $e) {
+            Log::error('Gagal membuat PDF riwayat deteksi.', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()
+                ->view('pdf.history', compact('detections'))
+                ->header('Content-Type', 'text/html; charset=UTF-8');
+        }
     }
 }
