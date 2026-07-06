@@ -143,10 +143,9 @@
         let marker = null;
 
         // Menggunakan Peta Satelit (Google Hybrid)
-        L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-            attribution: '© Google Maps'
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
         }).addTo(map);
 
         // Pin Marker Warna Hijau
@@ -188,7 +187,16 @@
             
             // Ubah tombol jadi loading
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Mencari lokasi...';
+            btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            if (!window.isSecureContext) {
+                alert('GPS perangkat hanya bisa dipakai lewat HTTPS. Buka website dengan https:// lalu izinkan akses lokasi.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                return;
+            }
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
@@ -215,6 +223,7 @@
                     
                     setTimeout(() => {
                         btn.innerHTML = originalText;
+                        btn.disabled = false;
                         btn.classList.replace('text-green-600', 'text-blue-600');
                         btn.classList.replace('bg-green-50', 'bg-blue-50');
                         btn.classList.replace('border-green-200', 'border-blue-200');
@@ -222,13 +231,15 @@
                     }, 3000);
 
                 }, function(error) {
-                    alert("Gagal mengambil lokasi GPS. Pastikan izin akses lokasi (Location/GPS) diaktifkan di pengaturan HP atau browser Anda.");
+                    alert("Gagal mengambil lokasi GPS. Pastikan izin akses lokasi (Location/GPS) diaktifkan dan browser memakai HTTPS.");
                     btn.innerHTML = originalText;
+                    btn.disabled = false;
                     btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }, { enableHighAccuracy: true });
+                }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
             } else {
                 alert("Browser atau perangkat Anda tidak mendukung fitur lokasi GPS.");
                 btn.innerHTML = originalText;
+                btn.disabled = false;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
             }
         });
