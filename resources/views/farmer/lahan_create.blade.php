@@ -105,8 +105,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const defaultLat = -3.1145; 
-        const defaultLng = 114.6030;
+            const defaultLat = -3.1465548676673087;
+            const defaultLng = 114.63686286411333;
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
         let marker = null;
 

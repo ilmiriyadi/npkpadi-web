@@ -16,7 +16,9 @@
         <!-- Pesan Tips Cetak PDF -->
         <div class="mb-4 flex items-start sm:items-center p-3 text-sm text-blue-800 rounded-xl bg-blue-50 border border-blue-100">
             <i class="fa-solid fa-circle-info mt-0.5 sm:mt-0 mr-2.5 text-blue-600 text-lg"></i>
-            <span><strong>Tips Cetak PDF:</strong> Anda dapat mencetak laporan PDF spesifik dengan menerapkan filter pencarian di bawah ini terlebih dahulu.</span>
+            <div>
+                <strong>Info Cetak PDF:</strong> Untuk menjaga kestabilan sistem, hasil unduhan dibatasi maksimal <strong>50 data terbaru</strong>. Dokumen cetak akan otomatis menyesuaikan dengan <strong>semua kriteria filter</strong> yang sedang Anda terapkan di bawah ini.
+            </div>
         </div>
 
         <form action="{{ route('admin.history') }}" method="GET" class="space-y-4">
@@ -46,10 +48,20 @@
                     <option value="3" {{ request('deficiency') == '3' ? 'selected' : '' }}>Kalium (K)</option>
                 </select>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1 ml-1">Dari Tanggal (Opsional)</label>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1 ml-1">Sampai Tanggal (Opsional)</label>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                </div>
+            </div>
 
             <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
                 <!-- Tombol Reset Filter Diperbaiki -->
-                @if(request('search') || request('land_id') || request('seed_type') || request('deficiency'))
+                @if(request('search') || request('land_id') || request('seed_type') || request('deficiency' ) || request('start_date') || request('end_date'))
                     <a href="{{ route('admin.history') }}" class="bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center tooltip" title="Hapus Semua Filter">
                         <i class="fa-solid fa-rotate-right"></i>
                     </a>
@@ -169,6 +181,29 @@
                 </tbody>
             </table>
         </div>
+
+                <div class="p-4 md:p-5 border-t border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-b-3xl">
+            
+                        <form action="{{ route('admin.history') }}" method="GET" class="flex items-center space-x-2">
+                                @foreach(request()->except(['per_page', 'page']) as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+                
+                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">Tampilkan:</span>
+                <select name="per_page" onchange="this.form.submit()" class="border border-gray-200 text-gray-600 text-sm rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                </select>
+                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">data</span>
+            </form>
+
+                        <div class="w-full md:w-auto">
+                {{ $detections->links() }}
+            </div>
+        </div>
+    </div>
     </div>
 
     <div id="detailModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
