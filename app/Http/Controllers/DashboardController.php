@@ -262,7 +262,9 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
-        $detections = $query->orderBy('created_at', 'desc')->get();
+        $perPage = $request->input('per_page', 10);
+
+        $detections = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
 
         $lands = \App\Models\Land::all();
 
@@ -496,7 +498,9 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
-        $detections = $query->orderBy('created_at', 'desc')->get();
+        $perPage = $request->input('per_page', 10);
+
+        $detections = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
 
         return view('farmer.history', compact('detections', 'lands'));
     }

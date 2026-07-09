@@ -130,8 +130,8 @@
         const dbLat = {{ $land->latitude ?? 'null' }};
         const dbLng = {{ $land->longitude ?? 'null' }};
 
-        const defaultLat = -3.1145; 
-        const defaultLng = 114.6030;
+        const defaultLat = -3.1465548676673087; 
+        const defaultLng = 114.63686286411333;
 
         // Tentukan titik awal peta
         let startLat = (dbLat !== null) ? dbLat : defaultLat;
