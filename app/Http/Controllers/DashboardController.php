@@ -262,6 +262,18 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
+        // 4. Filter Rentang Waktu (Date Range)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
         $perPage = $request->input('per_page', 10);
 
         $detections = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
@@ -297,6 +309,18 @@ class DashboardController extends Controller
         // 3. Filter Jenis Defisiensi
         if ($request->filled('deficiency')) {
             $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
+        // 4. Filter Rentang Waktu (Date Range)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
         }
 
         $totalDetections = (clone $query)->count();
@@ -498,6 +522,18 @@ class DashboardController extends Controller
             $query->where('nutrient_deficiency_id', $request->deficiency);
         }
 
+        // 5. Filter Rentang Waktu (Date Range)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
         $perPage = $request->input('per_page', 10);
 
         $detections = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
@@ -538,6 +574,18 @@ class DashboardController extends Controller
         // 4. Filter Jenis Defisiensi
         if ($request->filled('deficiency')) {
             $query->where('nutrient_deficiency_id', $request->deficiency);
+        }
+
+        // 5. Filter Rentang Waktu (Date Range)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
         }
 
         $totalDetections = (clone $query)->count();
