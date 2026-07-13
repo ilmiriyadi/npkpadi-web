@@ -30,10 +30,22 @@ class ApiAuthMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->bearerToken();
-        $expectedToken = config('app.sync_api_token');
+        // IP whitelist (opsional — kosong = semua boleh)
+        $allowedIps = config('sync.allowed_ips', '');
+        if ($allowedIps) {
+            $ipList = array_map('trim', explode(',', $allowedIps));
+            if (!in_array($request->ip(), $ipList)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Forbidden — IP tidak diizinkan.',
+                ], 403);
+            }
+        }
 
-        // Pastikan token ada dan cocok
+        // Bearer token check
+        $token = $request->bearerToken();
+        $expectedToken = config('sync.api_token') ?: config('app.sync_api_token');
+
         if (!$token || !$expectedToken || $token !== $expectedToken) {
             return response()->json([
                 'success' => false,

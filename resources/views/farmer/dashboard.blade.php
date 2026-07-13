@@ -87,7 +87,7 @@
                         </h4>
                         
                         <p class="text-gray-600 mb-4 text-sm leading-relaxed line-clamp-2">
-                            <span class="font-semibold">Saran:</span> {{ $deteksiTerbaru->nutrientDeficiency->solution }}
+                            <span class="font-semibold">Saran:</span> {{ ($deteksiTerbaru->land->seed_type ?? 'unggul') == 'unggul' ? ($deteksiTerbaru->nutrientDeficiency->saran_umum_unggul ?? '-') : ($deteksiTerbaru->nutrientDeficiency->saran_umum_lokal ?? '-') }}
                         </p>
                         
                         <a href="{{ route('farmer.history') }}" class="inline-flex items-center px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 rounded-xl font-semibold text-sm transition-colors">

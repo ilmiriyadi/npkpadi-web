@@ -32,9 +32,10 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-            UserSeeder::class,           // Akun Admin dibuat pertama
+            UserSeeder::class,              // Akun Admin dibuat pertama
             NutrientDeficiencySeeder::class, // Data Master Penyakit
-            // DetectionSeeder::class,    // <--- COMMENT INI kalau mau kosong
+            DeficiencySolutionSeeder::class, // Solusi per fase HST & jenis bibit
+            // DetectionSeeder::class,       // <--- COMMENT INI kalau mau kosong
         ]);
     }
 }

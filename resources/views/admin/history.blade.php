@@ -94,26 +94,32 @@
                 <tbody class="text-sm divide-y divide-gray-100">
                     @forelse($detections as $index => $detection)
                         @php
-                            $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
-                            $hst = intval($rawDays);
                             $seedType = $detection->land->seed_type ?? 'unggul';
                             $batasPanen = ($seedType == 'unggul') ? 110 : 270;
 
-                            if ($hst > $batasPanen) {
-                                $teksSolusi = "PERINGATAN!!! Umur padi di lahan ini tercatat " . $hst . " Hari Setelah Tanam (HST). Angka ini melebihi masa panen normal (" . $batasPanen . " hari untuk Bibit " . ucfirst($seedType) . ").\n\nSistem mendeteksi Anda mungkin belum memperbarui 'Tanggal Tanam' untuk musim tanam yang baru. Silakan edit Tanggal Tanam di menu 'Kelola Lahan' agar saran penanganan kembali akurat.";
+                            if (!$detection->land->planting_date) {
+                                $hst = 0;
+                                $teksSolusi = "[Saran Umum] - " . (($seedType == 'unggul') ? $detection->nutrientDeficiency->saran_umum_unggul : $detection->nutrientDeficiency->saran_umum_lokal);
                             } else {
-                                $solusi = $detection->nutrientDeficiency->solutions()->where('seed_type', $seedType)->where('min_hst', '<=', $hst)->where('max_hst', '>=', $hst)->first();
-                                if ($solusi) {
-                                    $teksSolusi = "[Fase " . $solusi->min_hst . "-" . $solusi->max_hst . " HST] - " . $solusi->solution_detail;
+                                $rawDays = \Carbon\Carbon::parse($detection->land->planting_date)->diffInDays($detection->created_at);
+                                $hst = intval($rawDays);
+
+                                if ($hst > $batasPanen) {
+                                    $teksSolusi = "PERINGATAN!!! Umur padi di lahan ini tercatat " . $hst . " Hari Setelah Tanam (HST). Angka ini melebihi masa panen normal (" . $batasPanen . " hari untuk Bibit " . ucfirst($seedType) . ").\n\nSistem mendeteksi Anda mungkin belum memperbarui 'Tanggal Tanam' untuk musim tanam yang baru. Silakan edit Tanggal Tanam di menu 'Kelola Lahan' agar saran penanganan kembali akurat.";
                                 } else {
-                                    $teksSolusi = "[Saran Umum] - " . (($seedType == 'unggul') ? $detection->nutrientDeficiency->saran_umum_unggul : $detection->nutrientDeficiency->saran_umum_lokal);
+                                    $solusi = $detection->nutrientDeficiency->solutions()->where('seed_type', $seedType)->where('min_hst', '<=', $hst)->where('max_hst', '>=', $hst)->first();
+                                    if ($solusi) {
+                                        $teksSolusi = "[Fase " . $solusi->min_hst . "-" . $solusi->max_hst . " HST] - " . $solusi->solution_detail;
+                                    } else {
+                                        $teksSolusi = "[Saran Umum] - " . (($seedType == 'unggul') ? $detection->nutrientDeficiency->saran_umum_unggul : $detection->nutrientDeficiency->saran_umum_lokal);
+                                    }
                                 }
                             }
                             $teksSolusiAman = str_replace(["\r", "\n"], ["", "\\n"], addslashes($teksSolusi));
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $index + 1 }}</td>
+                            <td class="px-6 py-4 text-center font-medium text-gray-500">{{ $detections->firstItem() + $index }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer" onclick="openDetailModal('{{ asset($detection->image_path) }}', '{{ $detection->nutrientDeficiency->name }}', '{{ round($detection->confidence_score, 2) }}', '{{ $teksSolusiAman }}', '{{ $detection->segmented_image_path ? asset($detection->segmented_image_path) : '' }}')">
                                     <img src="{{ asset($detection->image_path) }}" alt="Daun Padi" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">

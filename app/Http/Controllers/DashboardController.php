@@ -95,18 +95,14 @@ class DashboardController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100',
-            'solution' => 'required|string',
-            'solution_vegetative' => 'nullable|string',
-            'solution_generative' => 'nullable|string',
-            'solution_ripening' => 'nullable|string',
+            'saran_umum_unggul' => 'required|string',
+            'saran_umum_lokal' => 'nullable|string',
         ]);
 
         \App\Models\NutrientDeficiency::create([
             'name' => $request->name,
-            'solution' => $request->solution,
-            'solution_vegetative' => $request->solution_vegetative,
-            'solution_generative' => $request->solution_generative,
-            'solution_ripening' => $request->solution_ripening,
+            'saran_umum_unggul' => $request->saran_umum_unggul,
+            'saran_umum_lokal' => $request->saran_umum_lokal ?? '',
         ]);
 
         return redirect()->route('admin.datamaster')->with('success', 'Data Penyakit/Solusi baru berhasil ditambahkan!');
@@ -116,21 +112,34 @@ class DashboardController extends Controller
     public function adminDataMasterUpdate(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'solution' => 'required|string',
-            'solution_vegetative' => 'nullable|string',
-            'solution_generative' => 'nullable|string',
-            'solution_ripening' => 'nullable|string',
+            'saran_umum_unggul' => 'required|string',
+            'saran_umum_lokal' => 'nullable|string',
         ]);
 
         $deficiency = \App\Models\NutrientDeficiency::findOrFail($id);
         $deficiency->update([
-            'name' => $request->name,
-            'solution' => $request->solution,
-            'solution_vegetative' => $request->solution_vegetative,
-            'solution_generative' => $request->solution_generative,
-            'solution_ripening' => $request->solution_ripening,
+            'saran_umum_unggul' => $request->saran_umum_unggul,
+            'saran_umum_lokal' => $request->saran_umum_lokal ?? '',
         ]);
+
+        // Sync solusi per fase umur (unggul + lokal)
+        // Hapus semua solutions lama, lalu insert ulang dari form
+        $deficiency->solutions()->delete();
+
+        foreach (['unggul', 'lokal'] as $seedType) {
+            $solutions = $request->input("{$seedType}_solutions", []);
+            foreach ($solutions as $sol) {
+                if (!empty($sol['detail']) && isset($sol['min_hst']) && isset($sol['max_hst'])) {
+                    \App\Models\DeficiencySolution::create([
+                        'nutrient_deficiency_id' => $deficiency->nutrient_deficiency_id,
+                        'seed_type' => $seedType,
+                        'min_hst' => (int) $sol['min_hst'],
+                        'max_hst' => (int) $sol['max_hst'],
+                        'solution_detail' => $sol['detail'],
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.datamaster')->with('success', 'Data Penyakit/Solusi berhasil diperbarui!');
     }
@@ -237,7 +246,7 @@ class DashboardController extends Controller
     // Halaman Riwayat Deteksi Keseluruhan (Admin)
     public function adminHistory(Request $request)
     {
-        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency']);
+        $query = \App\Models\Detection::with(['land.user', 'nutrientDeficiency.solutions']);
 
         // 1. Filter Pencarian Teks (Petani & Lahan)
         if ($request->filled('search')) {
@@ -250,7 +259,12 @@ class DashboardController extends Controller
             });
         }
 
-        // 2. Filter Jenis Bibit
+        // 2. Filter Lahan
+        if ($request->filled('land_id')) {
+            $query->where('land_id', $request->land_id);
+        }
+
+        // 3. Filter Jenis Bibit
         if ($request->filled('seed_type')) {
             $query->whereHas('land', function($q) use ($request) {
                 $q->where('seed_type', $request->seed_type);
@@ -278,7 +292,7 @@ class DashboardController extends Controller
 
         $detections = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
 
-        $lands = \App\Models\Land::all();
+        $lands = \App\Models\Land::with('user')->get();
 
         return view('admin.history', compact('detections', 'lands'));
     }
@@ -490,7 +504,7 @@ class DashboardController extends Controller
     {
         $lands = \App\Models\Land::where('user_id', Auth::id())->get();
 
-        $query = \App\Models\Detection::with(['land', 'nutrientDeficiency'])
+        $query = \App\Models\Detection::with(['land', 'nutrientDeficiency.solutions'])
             ->whereHas('land', function($q) {
                 $q->where('user_id', auth()->id());
             });

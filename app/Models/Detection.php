@@ -20,6 +20,10 @@ class Detection extends Model
         'is_synced',
     ];
 
+    protected $casts = [
+        'is_synced' => 'boolean',
+    ];
+
     // Relasi: Deteksi ini terjadi di 1 Lahan
     public function land()
     {

@@ -110,7 +110,7 @@
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
         let marker = null;
 
-        L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             maxZoom: 20,
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
             attribution: '© Google Maps'

@@ -64,14 +64,23 @@ class SyncController extends Controller
      */
     public function receiveBatchDetections(Request $request)
     {
+        $maxBatch = config('sync.max_batch_size', 100);
+
         $request->validate([
             'user_id'    => 'required|integer',
-            'detections' => 'required|array|min:1',
+            'detections' => "required|array|min:1|max:{$maxBatch}",
             'detections.*.label'      => 'required|string',
             'detections.*.confidence' => 'required|numeric',
         ]);
 
-        $userId     = $request->input('user_id');
+        // Validasi user_id exists
+        $userId = $request->input('user_id');
+        if (!User::where('user_id', $userId)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => "User ID {$userId} tidak ditemukan",
+            ], 422);
+        }
         $detections = $request->input('detections');
         $synced     = [];
         $errors     = [];
@@ -218,9 +227,10 @@ class SyncController extends Controller
         $deficiencies = NutrientDeficiency::with('solutions')->get()
             ->map(function ($d) {
                 // Ekstrak label singkat dari nama lengkap.
-                // Contoh: "Defisiensi Nitrogen (N)" -> label = "Nitrogen (N)"
+                // DB stores: "Kekurangan Nitrogen (N)" → label = "Nitrogen (N)"
+                // Juga handle format lama: "Defisiensi Nitrogen (N)" → "Nitrogen (N)"
                 $label = $d->name;
-                if (preg_match('/Defisiensi\s+(.+)/i', $d->name, $matches)) {
+                if (preg_match('/(?:Kekurangan|Defisiensi)\s+(.+)/i', $d->name, $matches)) {
                     $label = trim($matches[1]);
                 }
 
@@ -310,9 +320,11 @@ class SyncController extends Controller
 
         // Jika user belum punya lahan, buat satu default
         $defaultLand = Land::create([
-            'user_id'  => $userId,
-            'name'     => $det['land_name'] ?? 'Lahan Default (Pi)',
-            'location' => 'Ditambahkan otomatis dari Raspberry Pi',
+            'user_id'       => $userId,
+            'name'          => $det['land_name'] ?? 'Lahan Default (Pi)',
+            'location'      => 'Ditambahkan otomatis dari Raspberry Pi',
+            'seed_type'     => 'unggul',
+            'planting_date' => now()->toDateString(),
         ]);
 
         return $defaultLand->land_id;
@@ -322,10 +334,13 @@ class SyncController extends Controller
      * Simpan gambar base64 ke storage Laravel.
      * Return path relatif untuk disimpan di database.
      */
-    private function saveImage(string $base64, $localId): string
+    private function saveImage(string $base64, $localId): ?string
     {
-        $imageData = base64_decode($base64);
-        $timestamp = now()->format('Ymd_His');
+        $imageData = base64_decode($base64, true);
+        if ($imageData === false || strlen($imageData) < 100) {
+            return null;  // Base64 invalid atau terlalu kecil
+        }
+        $timestamp = now()->format('Ymd_His_u');
         $filename  = "detections/pi_{$timestamp}_{$localId}.jpg";
 
         Storage::disk('public')->put($filename, $imageData);
