@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
 @section('title', 'Data Master Saran - NPK Padi')
-@section('header_title', 'Kelola Data Master Penyakit')
+@section('header_title', 'Kelola Data Master Defisiensi Nutrisi & Saran Penanganan')
 
 @section('content')
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">Daftar Penyakit & Saran Penanganan</h2>
+            <h2 class="text-xl font-bold text-gray-800">Daftar Defisiensi Nutrisi & Saran Penanganan</h2>
             <p class="text-gray-500 text-sm mt-1">Kelola saran penanganan berdasarkan jenis bibit yang akan dibaca oleh petani.</p>
         </div>
     </div>
@@ -29,7 +29,7 @@
                 <i class="fa-solid fa-circle-info text-blue-400"></i>
             </div>
             <div class="ml-3">
-                <p class="text-sm text-blue-700">Info: "Nama Kondisi" telah dikunci agar selalu sinkron dengan label kelas AI (MobileNetV2). Anda hanya dapat memperbarui rincian saran penanganan.</p>
+                <p class="text-sm text-blue-700">Info: "Jenis Defisiensi" telah dikunci agar selalu sinkron dengan label kelas AI (MobileNetV2). Anda hanya dapat memperbarui rincian saran penanganan.</p>
             </div>
         </div>
     </div>
@@ -40,7 +40,7 @@
                 <thead>
                     <tr class="bg-gray-50 text-gray-500 text-sm">
                         <th class="py-4 px-6 font-semibold w-16">ID</th>
-                        <th class="py-4 px-6 font-semibold">Nama Kondisi</th>
+                        <th class="py-4 px-6 font-semibold">Nama Defisiensi</th>
                         <th class="py-4 px-6 font-semibold text-center w-32">Aksi</th>
                     </tr>
                 </thead>
@@ -81,7 +81,7 @@
                         </div>
                         
                         <div class="mb-6">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Kondisi / Penyakit</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Defisiensi Nutrisi</label>
                             <input type="text" value="{{ $deficiency->name }}" class="w-full border-gray-200 bg-gray-50 text-gray-500 rounded-lg text-sm cursor-not-allowed" disabled>
                         </div>
 
